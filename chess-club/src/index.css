@@ -10,10 +10,10 @@
     "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
 
   /* Chess club colors */
-  --color-club-light: #ebf4dd;
-  --color-club-primary: #90ab8b;
-  --color-club-secondary: #5a7863;
-  --color-club-dark: #3b4953;
+  --color-club-primary: #628141;
+  --color-club-secondary: #8BAE66;
+  --color-club-light: #EBD5AB;
+  --color-club-dark: #1B211A;
 }
 
 /* -----------------------------
