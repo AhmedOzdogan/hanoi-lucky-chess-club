@@ -86,6 +86,20 @@ a {
   cursor: pointer;
 }
 
+/* Disabled buttons */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Disabled links (manual) */
+a.disabled,
+a[aria-disabled="true"] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-club-secondary);
   outline-offset: 2px;
@@ -109,4 +123,27 @@ a {
     transparent
   );
   border-radius: 999px;
+}
+
+
+/* -----------------------------
+   Toast Classes
+------------------------------ */
+/* Remove outer gap around each toast */
+.Toastify__toast {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Remove default body padding */
+.Toastify__toast-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* tighten stack spacing */
+.Toastify__toast-container {
+  padding: 12px !important;
 }

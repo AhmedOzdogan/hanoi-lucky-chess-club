@@ -27,7 +27,6 @@ function ButtonSecondary({
       className={`
         bg-club-light
         text-club-dark
-        p-2 m-1
         border-2
         rounded-2xl
         font-medium

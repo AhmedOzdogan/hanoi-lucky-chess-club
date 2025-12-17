@@ -2,6 +2,8 @@ import { useState } from "react"
 import { FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa"
 import ButtonPrimary from "../components/ButtonPrimary"
 import ButtonSecondary from "../components/ButtonSecondary"
+import { toastError, toastSuccess } from "../utils/toastUtils"
+
 
 function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
@@ -28,16 +30,16 @@ function LoginPage() {
                             type="email"
                             placeholder="Email"
                             className="
-                w-full
-                pl-10
-                pr-3
-                py-2
-                border
-                rounded-lg
-                focus:outline-none
-                focus:ring-2
-                focus:ring-club-primary
-              "
+                            w-full-50
+                            pl-10
+                            pr-3
+                            py-2
+                            border
+                            rounded-lg
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-club-primary
+                        "
                         />
                     </div>
 
@@ -62,6 +64,7 @@ function LoginPage() {
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-2.5 text-club-dark/60"
+
                         >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
@@ -69,7 +72,7 @@ function LoginPage() {
 
                     {/* Actions */}
                     <div className="flex flex-col gap-3 mt-6">
-                        <ButtonPrimary label="Login" size="lg" />
+                        <ButtonPrimary label="Login" size="lg" onClick={() => toastSuccess("Login failed")} />
                         <ButtonSecondary label="Forgot password?" size="md" />
                     </div>
 

@@ -4,10 +4,13 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import ToastContainer from './components/ToastContainer';
 
 function App() {
   return (
     <>
+
+      <ToastContainer />
       <Header />
 
       <Routes>
