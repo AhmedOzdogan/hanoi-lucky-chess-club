@@ -1,222 +1,286 @@
 import { useEffect, useRef, useState } from "react";
-import ChessBoard from "../components/ChessBoard";
+import { useNavigate } from "react-router-dom";
+
+import useAttempt from "../hooks/useAttempt";
+import { useUser } from "../hooks/useUser";
+import { usePuzzleTimer } from "../hooks/usePuzzleTimer";
 import fetchDailyPuzzle from "../hooks/useFetchPuzzle";
+
+import ChessBoard from "../components/ChessBoard";
+import ChessLoading from "../components/ChessboardComps/ChessLoading";
+import ChessLeaderboard from "../components/ChessboardComps/ChessLeaderboard";
+import type { ChessLeaderboardEntry } from "../components/ChessboardComps/ChessLeaderboard";
+
 import {
     initPuzzleEngine,
     tryPuzzleMove,
     type PuzzleEngine,
 } from "../utils/puzzleEngine";
 
+import { getPuzzleStats, updatePuzzleStats } from "../utils/puzzleStats";
+import { toastError, toastSuccess, toastInfo } from "../utils/toastUtils";
+
 function ChessPuzzle() {
-    /*
-      1. Fetch the daily puzzle data.
-         This includes:
-         - full game PGN
-         - puzzle solution moves
-         - loading and error states
-    */
+    const navigate = useNavigate();
+
+    // User information
+    const user = useUser();
+    const userId = user.user?.id ?? null;
+
+    //Allow moves only if user has not played today
+
+    const [movesEnabled, setMovesEnabled] = useState(true);
+
+    // Daily puzzle data
     const { puzzle, loading, error } = fetchDailyPuzzle();
 
-    /*
-      2. Store the puzzle engine in a ref.
-         - useRef is used so the engine persists across renders
-         - changing engine state should NOT trigger re-renders
-    */
+    // Puzzle engine reference
     const engineRef = useRef<PuzzleEngine | null>(null);
 
-    /*
-      3. FEN string that controls the board position.
-         Whenever this state changes, the chessboard updates.
-    */
+    // Board position
     const [fen, setFen] = useState("");
 
-    /*
-      4. Board orientation is visual only.
-         "white" means white pieces are at the bottom.
-         "black" means black pieces are at the bottom.
-    */
+    // Board orientation
     const [boardOrientation, setBoardOrientation] =
         useState<"white" | "black">("white");
 
-    /* ================= INITIALIZE PUZZLE ENGINE ================= */
+    // Timer reset trigger
+    const [resetKey, setResetKey] = useState(0);
 
+    // Elapsed time
+    const { elapsed } = usePuzzleTimer(resetKey, movesEnabled);
+
+    // Displayed time
+    const displayElapsed = movesEnabled
+        ? elapsed
+        : user.puzzleStats?.time_seconds;
+
+    // Attempts counter
+    const { attempts, incrementAttempt } = useAttempt();
+
+    //Displayed attempts
+    const displayAttempts = movesEnabled
+        ? attempts
+        : user.puzzleStats?.attempt;
+
+    // Leaderboard data
+    const [puzzleStats, setPuzzleStats] = useState<ChessLeaderboardEntry[]>([]);
+
+    // Leaderboard loading state
+    const [statsLoading, setStatsLoading] = useState(true);
+
+    // Leaderboard error state
+    const [statsError, setStatsError] = useState<string | null>(null);
+
+    // Today’s puzzle date
+    const puzzleDate = new Date().toISOString().slice(0, 10);
+
+
+    // Redirect if user is not logged in
     useEffect(() => {
-        /*
-          5. Do nothing until puzzle data is available.
-        */
+        if (!user.loading && !userId) {
+            toastError("You must be logged in to access the daily puzzle.");
+            navigate("/login");
+        }
+    }, [user.loading, userId, navigate]);
+
+    // Notify if user has already played today
+    useEffect(() => {
+        if (!user.loading && user.puzzleStats) {
+            toastInfo("You have already played today's puzzle. Come back tomorrow!");
+            setMovesEnabled(false);
+            console.log("Moves disabled because user has already played today.");
+        }
+    }, [user.loading, user.puzzleStats]);
+
+
+    // Initialize puzzle engine when puzzle loads
+    useEffect(() => {
         if (!puzzle) return;
 
-        /*
-          6. Initialize the puzzle engine.
-             Inside initPuzzleEngine:
-             - the full PGN is loaded
-             - the opponent’s last move is extracted and saved
-             - that last move is undone
-             After this call, the engine is positioned
-             BEFORE the opponent’s blunder.
-        */
         engineRef.current = initPuzzleEngine(
             puzzle.game.pgn,
             puzzle.puzzle.solution
         );
 
-        /*
-          7. Get the FEN of the position BEFORE the last move.
-             This is the position we want to show first.
-        */
-        const fenBeforeLastMove = engineRef.current.chess.fen();
+        const initialFen = engineRef.current.chess.fen();
+        setFen(initialFen);
 
-        /*
-          8. Render that position on the board.
-        */
-        setFen(fenBeforeLastMove);
-
-        /*
-          9. Determine whose turn it is.
-             chess.turn() returns:
-             - "w" if white is to move
-             - "b" if black is to move
-
-             The board is oriented so the side to move
-             is visually at the bottom.
-        */
         const turn = engineRef.current.chess.turn();
         setBoardOrientation(turn === "w" ? "black" : "white");
 
-        /*
-          10. Apply the opponent’s last move after a delay.
-              This delay exists purely for visual clarity,
-              so the user can see the blunder happen.
-        */
         const timer = setTimeout(() => {
             if (!engineRef.current) return;
 
-            /*
-              11. The opponent’s last move was stored
-                  inside the puzzle engine during initialization.
-            */
             const { from, to, promotion } = engineRef.current.lastMove;
 
-            /*
-              12. Apply the opponent’s blunder move.
-            */
             engineRef.current.chess.move({
                 from,
                 to,
                 promotion: promotion ?? "q",
             });
 
-            /*
-              13. Update the board to reflect the move.
-            */
             setFen(engineRef.current.chess.fen());
         }, 1000);
 
-        /*
-          14. Cleanup:
-              If the component unmounts or the puzzle changes,
-              cancel the delayed move to avoid side effects.
-        */
         return () => clearTimeout(timer);
-
     }, [puzzle]);
 
-    /* ================= HANDLE USER MOVE ================= */
+    // Reset timer when puzzle changes
+    useEffect(() => {
+        if (!puzzle?.puzzle?.id) return;
+        setResetKey(prev => prev + 1);
+    }, [puzzle?.puzzle?.id]);
 
+    // Fetch leaderboard stats
+    useEffect(() => {
+        setStatsLoading(true);
+        setStatsError(null);
+
+        (async () => {
+            try {
+                const { data, error } = await getPuzzleStats(puzzleDate);
+
+                if (error) {
+                    setStatsError(error.message);
+                    return;
+                }
+
+                setPuzzleStats(data || []);
+            } catch (err: any) {
+                setStatsError(err.message);
+            } finally {
+                setStatsLoading(false);
+            }
+        })();
+    }, [puzzleDate]);
+
+    // Handle user move on the board
     const handleMove = (from: string, to: string) => {
-        /*
-          15. If the puzzle engine is not initialized,
-              ignore all moves.
-        */
         if (!engineRef.current) return false;
+        if (from === to) return false;
 
-        /*
-          16. If a piece is dropped onto the same square,
-              ignore the action silently.
-        */
-        if (from === to) {
-            return false;
-        }
-
-        /*
-          17. Delegate move validation to the puzzle engine.
-              The engine will decide whether the move is:
-              - illegal
-              - legal but wrong for the puzzle
-              - correct
-        */
         const result = tryPuzzleMove(engineRef.current, from, to);
 
-        /*
-          18. Case: Illegal chess move.
-              Examples:
-              - wrong turn
-              - illegal square
-              - invalid piece movement
+        if (!result.ok && !result.wrong) return false;
 
-              The move is ignored silently.
-        */
-        if (!result.ok && !result.wrong) {
-            return false;
-        }
-
-        /*
-          19. Case: Legal chess move but WRONG puzzle move.
-              The engine has already undone the move.
-              Here we only notify the user.
-        */
         if (result.wrong) {
-            alert("Wrong move, try again");
+            if (result.previewFen) {
+                setFen(result.previewFen);
+            }
+
+            setTimeout(() => {
+                setFen(result.fen);
+                toastError("Wrong move for the puzzle. Try another move.");
+                incrementAttempt();
+            }, 500);
+
             return false;
         }
 
-        /*
-          20. Case: Correct puzzle move.
-              Update the board position.
-        */
         setFen(result.fen);
 
-        /*
-          21. If there are no more solution moves,
-              the puzzle is solved.
-        */
+        if (result.pendingOpponentMove) {
+            setTimeout(() => {
+                if (!engineRef.current || !result.pendingOpponentMove) return;
+
+                const { from, to, promotion } = result.pendingOpponentMove;
+
+                engineRef.current.chess.move({
+                    from,
+                    to,
+                    promotion: promotion ?? "q",
+                });
+
+                setFen(engineRef.current.chess.fen());
+            }, 500);
+        }
+
         if (result.finished) {
-            alert("Puzzle solved");
+            toastSuccess("Puzzle solved! Well done.");
+
+            if (userId) {
+                updatePuzzleStats(userId, puzzleDate, elapsed, attempts)
+                    .then(({ error }) => {
+                        if (error) {
+                            console.error("Error updating puzzle stats:", error);
+                        }
+                    });
+            }
+
+            return true;
         }
 
         return true;
     };
 
-    /* ================= RENDER ================= */
+    // Loading screen
+    if (loading || user.loading) {
+        return (
+            <div className="grow">
+                <ChessLoading
+                    text="Loading puzzle" />
+            </div>
+        );
+    }
 
-    /*
-      22. Show loading state while fetching puzzle.
-    */
-    if (loading) return <div>Loading</div>;
+    // Stop render if user is missing
+    if (!user.user) return null;
 
-    /*
-      23. Show error state if fetch fails.
-    */
+    // Error state
     if (error) return <div>Error: {error}</div>;
 
-    /*
-      24. Safety check: do not render the board
-          until a valid FEN exists.
-    */
+    // Wait until board is ready
     if (!fen) return null;
 
     return (
-        <div className="grow">
-            {/* 
-              25. Center the chessboard horizontally
-                  and limit its maximum width.
-            */}
-            <div className="w-full max-w-md justify-center items-center mx-auto my-8">
-                <ChessBoard
-                    fen={fen}
-                    onMove={handleMove}
-                    boardOrientation={boardOrientation}
-                />
+        <div className="grow flex flex-col items-center">
+            <div className="w-full max-w-5xl mx-auto mt-6 mb-8">
+                <div className="relative flex justify-center">
+                    <div className="flex items-center gap-3 bg-club-primary/20 px-8 py-4 rounded-xl border border-black/20 shadow-md">
+                        <h1 className="text-2xl font-semibold tracking-wide">
+                            Daily Chess Puzzle - Rating : {puzzle?.puzzle.rating}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex w-full max-w-270 justify-center items-start gap-12 mx-auto">
+                <div className="flex justify-center">
+                    <ChessBoard
+                        fen={fen}
+                        onMove={handleMove}
+                        boardOrientation={boardOrientation}
+                        movesEnabled={movesEnabled}
+                    />
+                </div>
+                <div className="w-full max-w-md flex flex-col gap-4">
+
+                    {statsLoading && (
+                        <div className="text-sm text-gray-500 text-center">
+                            Loading leaderboard…
+                        </div>
+                    )}
+
+                    {statsError && (
+                        <div className="text-sm text-red-500 text-center">
+                            {statsError}
+                        </div>
+                    )}
+
+                    {!statsLoading && !statsError && (
+                        <ChessLeaderboard
+                            user_id={userId}
+                            data={puzzleStats}
+                            time={displayElapsed}
+                            attempts={displayAttempts}
+                            statsLoading={statsLoading}
+                            statsError={statsError}
+                            displayElapsed={displayElapsed}
+                            displayAttempts={displayAttempts}
+                            movesEnabled={movesEnabled} />
+                    )}
+                </div>
             </div>
         </div>
     );

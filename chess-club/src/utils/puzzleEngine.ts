@@ -109,6 +109,9 @@ export function tryPuzzleMove(
     wrong?: boolean;
     fen: string;
     finished: boolean;
+    pendingOpponentMove?: { from: string; to: string; promotion?: string } | null;
+    wrongMove?: { from: string; to: string, promotion?: string } | null;
+    previewFen?: string;
 } {
     let move;
     try {
@@ -152,32 +155,46 @@ export function tryPuzzleMove(
     const expFrom = expected.slice(0, 2);
     const expTo = expected.slice(2, 4);
 
-    // Wrong move for the puzzle -> undo and ignore
-    // Undo is necessary here to revert the board state,
-    // because the user move was applied but is not part of the solution.
     if (from !== expFrom || to !== expTo) {
+        // Capture board AFTER the wrong (but legal) move
+        const previewFen = engine.chess.fen();
+
+        // Revert the move so puzzle state remains correct
         engine.chess.undo();
+
         return {
             ok: false,
             wrong: true,
+            previewFen,
             fen: engine.chess.fen(),
             finished: false,
+            wrongMove: {
+                from,
+                to,
+                ...(to[1] === "8" || to[1] === "1" ? { promotion: "q" } : {}),
+            },
         };
     }
 
     // Correct user move
     engine.index++;
 
-    // Auto-play opponent reply if exists
+    // Prepare opponent reply if it exists,
+    // but DO NOT apply it yet.
+    // React will decide WHEN to play it (for animation / delay).
+    let pendingOpponentMove: { from: string; to: string; promotion?: string } | null = null;
+
     if (engine.index < engine.solution.length) {
         const opp = engine.solution[engine.index];
 
-        engine.chess.move({
+        pendingOpponentMove = {
             from: opp.slice(0, 2),
             to: opp.slice(2, 4),
             promotion: "q",
-        });
+        };
 
+        // Advance solution index,
+        // but leave the move unplayed for now.
         engine.index++;
     }
 
@@ -185,5 +202,6 @@ export function tryPuzzleMove(
         ok: true,
         fen: engine.chess.fen(),
         finished: engine.index >= engine.solution.length,
+        pendingOpponentMove,
     };
 }

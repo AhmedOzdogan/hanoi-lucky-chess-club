@@ -6,6 +6,7 @@ interface ChessBoardProps {
     fen?: string;
     onMove: (from: string, to: string) => boolean;
     boardOrientation?: "white" | "black";
+    movesEnabled?: boolean;
 }
 
 function isValidFen(fen: string) {
@@ -17,7 +18,7 @@ function isValidFen(fen: string) {
     }
 }
 
-function ChessBoard({ fen, onMove, boardOrientation }: ChessBoardProps) {
+function ChessBoard({ fen, onMove, boardOrientation, movesEnabled = true }: ChessBoardProps) {
     if (!fen || !isValidFen(fen)) {
         return null;
     }
@@ -37,8 +38,8 @@ function ChessBoard({ fen, onMove, boardOrientation }: ChessBoardProps) {
             boxShadow: "0 5px 15px rgba(0,0,0,0.5)",
         },
 
-        animationDuration: 300,
-        arePiecesDraggable: true,
+        animationDuration: 1000,
+        allowDragging: movesEnabled,
         boardOrientation: boardOrientation ?? "white",
         allowDrawingArrows: true,
         animationDurationInMs: 400,

@@ -7,7 +7,7 @@ interface Profile {
     username: string;
 }
 
-interface ChessStats {
+export interface ChessStats {
     chess_com_name: string | null;
     chess_com_player_id: number | null;
     chess_com_blitz: number | null;
@@ -19,10 +19,19 @@ interface ChessStats {
     fide_rating: number | null;
 }
 
+interface PuzzleStats {
+    user_id: string;
+    puzzle_date: string;
+    time_seconds: number;
+    solved_at: string;
+    attempt: number;
+}
+
 export function useUser() {
     const [authUser, setAuthUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [chessStats, setChessStats] = useState<ChessStats | null>(null);
+    const [puzzleStats, setPuzzleStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     async function loadUser() {
@@ -36,6 +45,7 @@ export function useUser() {
             setAuthUser(null);
             setProfile(null);
             setChessStats(null);
+            setPuzzleStats(null);
             setLoading(false);
             return;
         }
@@ -65,9 +75,18 @@ export function useUser() {
             .eq("id", user.id)
             .maybeSingle()
             .returns<ChessStats>();
+        const today = new Date().toISOString().split("T")[0];
 
-        if (profileError || chessError) {
-            console.error("Error loading user data:", profileError?.message, chessError?.message);
+        const { data: puzzleData, error: puzzleError } = await supabasePersistent
+            .from("daily_puzzle_solves")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("puzzle_date", today)
+            .single()
+            .returns<PuzzleStats>()
+
+        if (profileError || chessError || puzzleError) {
+            console.error("Error loading user data:", profileError?.message, chessError?.message, puzzleError?.message);
             setProfile(null);
             setChessStats(null);
             setLoading(false);
@@ -76,6 +95,7 @@ export function useUser() {
 
         setProfile(profileData ?? null);
         setChessStats(chessData ?? null);
+        setPuzzleStats(puzzleData ?? null);
         setLoading(false);
     }
 
@@ -95,6 +115,7 @@ export function useUser() {
         user: authUser,
         profile,
         chessStats,
+        puzzleStats,
         loading,
     };
 }

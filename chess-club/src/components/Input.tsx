@@ -2,10 +2,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     placeholder?: string;
     icon?: boolean
     password_check?: boolean
+    value?: string;
+    type?: string;
 }
 
 function Input({
     type = "email",
+    value,
     placeholder = "Email",
     icon = false,
     password_check = false,
@@ -15,6 +18,7 @@ function Input({
         <input
             type={type}
             placeholder={placeholder}
+            value={value}
             className={`
             w-full
             ${icon ? "pl-8" : "pl-3"}
