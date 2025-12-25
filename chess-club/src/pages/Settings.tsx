@@ -3,16 +3,17 @@ import { useState, useRef, useEffect } from 'react';
 import Input from '../components/Input';
 import ButtonPrimary from '../components/Button/ButtonPrimary';
 import { useUser } from "../hooks/useUser";
+import { useChangeUsername } from '../hooks/useChangeUsername';
 import type { ChessStats } from "../hooks/useUser";
 import ChessLoading from '../components/ChessboardComps/ChessLoading';
+import { checkUsernameAvailable } from '../utils/checkUsernameAvailable';
+import { toastSuccess } from '../utils/toastUtils';
+
 function Settings() {
-
     const user = useUser();
-
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const chessStats = useRef<ChessStats>(user.chessStats);
-
     useEffect(() => {
         if (!user.loading && user.profile && user.user) {
             setUsername(user.profile.username ?? '');
@@ -20,7 +21,15 @@ function Settings() {
             chessStats.current = user.chessStats;
         }
     }, [user.loading]);
-
+    const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
+    const [checkingUsername, setCheckingUsername] = useState(false);
+    const [usernameChanged, setUsernameChanged] = useState<boolean>(false);
+    useEffect(() => {
+        if (username !== (user.profile?.username ?? '')) {
+            setIsUsernameAvailable(null);
+        }
+    }, [username]);
+    const { changeUsername } = useChangeUsername();
     if (user.loading) {
         return (
             <div className='flex flex-1'>
@@ -29,80 +38,354 @@ function Settings() {
             </div>
         );
     }
-
     return (
-        <div className="p-6 max-w-2xl mx-auto bg-club-light/60 border border-black/20 rounded-2xl shadow-lg space-y-8">
-            <div className="space-y-4 bg-white/60 p-4 rounded-xl border border-black/10">
-                <h2 className="text-lg font-semibold mb-2">Profile</h2>
-                <Input value={username} onChange={(e) => setUsername(e.target.value)} />
-                <Input
+        <div
+            className="
+                min-h-screen
+                w-full
+                flex
+                justify-center
+                items-center
+                bg-club-primary/20
 
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-            </div>
-            <div className="space-y-4 bg-white/60 p-4 rounded-xl border border-black/10">
-                <h2 className="text-lg font-semibold">Chess.com</h2>
-                <Input value={chessStats.current?.chess_com_name || ''} onChange={(e) => {
-                    if (chessStats.current) {
-                        chessStats.current.chess_com_name = e.target.value;
-                    }
-                }} />
-                <p>
-                    Stats are defult 1200. If you are seeing 1200 it means you have not
-                    connected your chess.com account yet.
-                    Please check your username and update your stats
-                </p>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                        <h3 className="text-lg font-medium">blitz</h3>
-                        <p>Rating: {chessStats.current?.chess_com_blitz || 'N/A'}</p>
+                overflow-y-auto
+
+                /* Hide scrollbar (mobile + tablet) */
+                scrollbar-width-none
+                [&::-webkit-scrollbar]:hidden
+
+                /* Bring scrollbar back on large screens */
+                lg:scrollbar-auto
+                lg:[&::-webkit-scrollbar]:block
+            "
+        >
+            <div
+                className="
+                    w-full
+                    max-w-3xl
+
+                    bg-linear-to-b
+                    from-club-light
+                    to-white/80
+
+                    border
+                    border-black/20
+
+                    px-4
+                    py-2
+
+                    space-y-6
+
+                    sm:px-6
+                    sm:py-4
+                    sm:space-y-8
+
+                    md:rounded-4xl
+                    md:shadow-[0_20px_60px_rgba(0,0,0,0.25)]
+                    md:backdrop-blur-xl
+                    md:pb-10
+                    md:my-5
+                "
+            >
+                <h1
+                    className="
+                        text-xl
+                        sm:text-5xl
+                        font-extrabold
+                        text-center
+                        tracking-wide
+                        drop-shadow-lg
+                        text-club-primary
+                    "
+                >
+                    Settings
+                </h1>
+
+                <div
+                    className="
+                        bg-white/80
+                        rounded-3xl
+                        border-2
+                        border-black/20
+                        shadow-xl
+
+                        p-4
+                        sm:p-8
+
+                        space-y-4
+                        sm:space-y-8
+                    "
+                >
+                    <h2
+                        className="
+                            text-lg
+                            sm:text-2xl
+                            font-extrabold
+                            text-center
+                            text-club-primary
+                        "
+                    >
+                        Profile
+                    </h2>
+
+                    <div
+                        className="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            w-full
+                            items-start
+                            sm:items-center
+                            justify-between
+                            gap-1
+                            sm:gap-3
+                        "
+                    >
+                        <label className="block text-sm font-semibold text-gray-800 min-w-24">
+                            Username :
+                        </label>
+
+                        <div
+                            className="
+                                flex
+                                flex-col
+                                sm:flex-row
+                                w-full
+                                sm:items-center
+                                gap-1
+                                sm:gap-3
+                            "
+                        >
+                            <Input
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                readOnly={usernameChanged}
+                            />
+
+                            <div className="w-full sm:w-auto">
+                                <ButtonPrimary
+                                    label={isUsernameAvailable === false ? "Not available" : "Change Username"}
+                                    size="md"
+                                    onClick={async () => {
+                                        try {
+                                            setCheckingUsername(true);
+
+                                            const available = await checkUsernameAvailable(username);
+
+                                            if (!available) {
+                                                setIsUsernameAvailable(false);
+                                                return;
+                                            }
+
+                                            await changeUsername(username);
+                                            setIsUsernameAvailable(true);
+
+                                        } finally {
+                                            setCheckingUsername(false);
+                                            setUsernameChanged(true);
+                                            toastSuccess("Username changed successfully to " + username + "!");
+                                        }
+                                    }}
+                                    disabled={
+                                        checkingUsername ||
+                                        !username.trim() ||
+                                        username === (user.profile?.username ?? '') ||
+                                        usernameChanged
+
+                                    }
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">bullet</h3>
-                        <p>Rating: {chessStats.current?.chess_com_bullet || 'N/A'}</p>
+
+                    <div
+                        className="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            w-full
+                            items-start
+                            sm:items-center
+                            justify-between
+                            gap-1
+                            sm:gap-3
+                        "
+                    >
+                        <label className="block text-sm font-semibold text-gray-800 min-w-24">
+                            Email :
+                        </label>
+
+                        <Input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            readOnly
+                        />
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">rapid</h3>
-                        <p>Rating: {chessStats.current?.chess_com_rapid || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-medium">daily</h3>
-                        <p>Rating: {chessStats.current?.chess_com_daily || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-medium">960 daily</h3>
-                        <p>Rating: {chessStats.current?.chess_com_960_daily || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-medium">title</h3>
-                        <p>Rating: {chessStats.current?.chess_com_title || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-medium">fide rating</h3>
-                        <p>Rating: {chessStats.current?.fide_rating || 'N/A'}</p>
+
+                    <div className="pt-4 flex justify-center">
+                        <ButtonPrimary label="Reset Password" onClick={() => { }} />
                     </div>
                 </div>
-            </div>
-            <div className="flex flex-col gap-3 pt-4">
-                <ButtonPrimary label="Reset Password" onClick={() => {
-                    // Handle reset password logic here
-                }} />
 
-                <ButtonPrimary label="Fetch Chess.com Stats" onClick={async () => {
-                    return;
-                    // Fetch chess.com stats logic here
-                    // You can use chessStats.current?.chess_com_name to get the username
-                }} />
+                <div
+                    className="
+                        bg-white/80
+                        rounded-3xl
+                        border-2
+                        border-black/20
+                        shadow-xl
 
-                <ButtonPrimary label="Update Profile" onClick={() => {
-                    // Handle profile update logic here
-                }} />
-            </div>
+                        p-4
+                        sm:p-8
 
-            <div className="pt-6 border-t border-black/10">
-                <Outlet />
+                        space-y-4
+                        sm:space-y-8
+                    "
+                >
+                    <h2
+                        className="
+                            text-lg
+                            sm:text-2xl
+                            font-extrabold
+                            text-center
+                            text-club-primary
+                        "
+                    >
+                        Chess.com
+                    </h2>
+
+                    <div
+                        className="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            w-full
+                            items-start
+                            sm:items-center
+                            justify-between
+                            gap-1
+                            sm:gap-3
+                        "
+                    >
+                        <label className="block text-sm font-semibold text-gray-800 min-w-24">
+                            Chess Username :
+                        </label>
+
+                        <div
+                            className="
+                                flex
+                                flex-col
+                                sm:flex-row
+                                w-full
+                                sm:items-center
+                                gap-1
+                                sm:gap-3
+                            "
+                        >
+                            <Input
+                                value={chessStats.current?.chess_com_name || ''}
+                                onChange={(e) => {
+                                    if (chessStats.current) {
+                                        chessStats.current.chess_com_name =
+                                            e.target.value;
+                                    }
+                                }}
+                            />
+
+                            <div className="w-full sm:w-auto">
+                                <ButtonPrimary
+                                    label="Fetch Stats"
+                                    onClick={async () => {
+                                        return;
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="w-full">
+                        <p
+                            className="
+                                w-full
+                                m-0
+                                text-[10px]
+                                sm:text-base
+                                text-gray-800
+                                bg-club-light/60
+                                p-2
+                                sm:p-4
+                                rounded-xl
+                                sm:rounded-2xl
+                                border-2
+                                border-black/20
+                                leading-relaxed
+                            "
+                        >
+                            Default stats are shown as
+                            <span className="font-semibold"> 1200 </span>. If you still
+                            see 1200, your Chess.com account is not connected yet.
+                            Please verify your username and refresh your stats.
+                        </p>
+                    </div>
+
+                    <div
+                        className="
+                            grid
+                            grid-cols-1
+                            sm:grid-cols-2
+                            lg:grid-cols-3
+
+                            gap-2
+                            sm:gap-6
+
+                            text-[10px]
+                            sm:text-sm
+                            text-center
+                        "
+                    >
+                        {[
+                            ['Blitz', chessStats.current?.chess_com_blitz],
+                            ['Bullet', chessStats.current?.chess_com_bullet],
+                            ['Rapid', chessStats.current?.chess_com_rapid],
+                            ['Daily', chessStats.current?.chess_com_daily],
+                            ['960 Daily', chessStats.current?.chess_com_960_daily],
+                            ['Title', chessStats.current?.chess_com_title],
+                            ['Fide Rating', chessStats.current?.fide_rating],
+                        ].map(([label, value]) => (
+                            <div
+                                key={label}
+                                className="
+                                    bg-club-primary/20
+                                    border-2
+                                    border-black
+                                    shadow-xl
+
+                                    p-3
+                                    sm:p-5
+
+                                    rounded-2xl
+                                    sm:rounded-3xl
+
+                                    flex
+                                    flex-col
+                                    items-center
+                                    text-center
+
+                                    hover:scale-[1.06]
+                                    transition-all
+                                    duration-300
+                                "
+                            >
+                                <h3 className="text-lg font-medium">{label}</h3>
+                                <p>Rating: {value || 'N/A'}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="pt-8 border-t border-black/20 flex justify-center">
+                    <Outlet />
+                </div>
             </div>
         </div>
     );

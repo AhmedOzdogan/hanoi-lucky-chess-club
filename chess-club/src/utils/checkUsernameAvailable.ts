@@ -6,12 +6,17 @@ export async function checkUsernameAvailable(username: string): Promise<boolean>
         .from("profiles")
         .select("username")
         .eq("username", username)
-        .single();
+        .maybeSingle();
 
     if (error) {
+        toast.error(`Error checking username availability: ${error.message}`);
+        return false;
+    }
+
+    if (data) {
         toast.error("Username is not available. Please choose another one.");
         return false;
     }
 
-    return !data;
+    return true;
 }

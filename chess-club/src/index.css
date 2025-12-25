@@ -153,3 +153,20 @@ a[aria-disabled="true"] {
 .Toastify__toast-container {
   padding: 12px !important;
 }
+
+
+/* -----------------------------
+   Remove Scroolbar for mobile and md screens
+------------------------------ */
+@media (max-width: 1200px) {
+  html,
+  body {
+    -ms-overflow-style: none; /* IE */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+}
