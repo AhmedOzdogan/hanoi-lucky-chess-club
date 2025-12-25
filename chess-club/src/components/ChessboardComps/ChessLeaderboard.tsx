@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 
 // Types for leaderboard rows coming from the database
 export interface ChessLeaderboardEntry {
@@ -35,45 +35,40 @@ function ChessLeaderboard({
     displayAttempts,
     movesEnabled,
 }: ChessLeaderboardProps) {
-    // it is sorted from database query
-    const leaderboard = data;
+    // -------- MEMOIZED LEADERBOARD + WINDOW LOGIC --------
+    const leaderboard = useMemo(() => data, [data]);
 
-    // Controls how many rows around the user are shown
-    const WINDOW = 5;
-    const total = leaderboard.length;
+    const {
+        visibleRows,
+        userIndex,
+        total
+    } = useMemo(() => {
+        const WINDOW = 5;
+        const total = leaderboard.length;
 
-    const userIndex = leaderboard.findIndex(
-        (entry) => entry.user_id === user_id
-    );
+        const userIndex = leaderboard.findIndex(
+            (entry) => entry.user_id === user_id
+        );
 
-    // Always keep top 3
-    const topRows = leaderboard.slice(0, 3);
+        const topRows = leaderboard.slice(0, 3);
+        let visible: ChessLeaderboardEntry[] = [];
 
-    let visibleRows: ChessLeaderboardEntry[] = [];
+        if (userIndex === -1) {
+            visible = leaderboard.slice(0, 10);
+        } else if (userIndex < 3) {
+            visible = leaderboard.slice(0, 10);
+        } else if (userIndex >= total - WINDOW) {
+            const tempVisibleRows = leaderboard.slice(Math.max(total - 10, 0), total);
+            visible = [...topRows, ...tempVisibleRows];
+        } else {
+            const start = Math.max(userIndex - WINDOW, 3);
+            const end = Math.min(userIndex + WINDOW + 1, total);
+            const middleRows = leaderboard.slice(start, end);
+            visible = [...topRows, ...middleRows];
+        }
 
-    // CASE 1: User not found → fallback top 10
-    if (userIndex === -1) {
-        visibleRows = leaderboard.slice(0, 10);
-    }
-
-    // CASE 2: User is in top 3 → show top 10
-    else if (userIndex < 3) {
-        visibleRows = leaderboard.slice(0, 10);
-
-        // if user is last 5 in the →list show last 10
-    } else if (userIndex >= total - WINDOW) {
-        let tempVisibleRows = leaderboard.slice(Math.max(total - 10, 0), total);
-        visibleRows = [...topRows, ...tempVisibleRows]
-    }
-
-    // CASE 3: User is NOT in top 3 → top 3 or last 5 + user ± 5
-    else {
-        const start = Math.max(userIndex - WINDOW, 3);
-        const end = Math.min(userIndex + WINDOW + 1, total);
-
-        const middleRows = leaderboard.slice(start, end);
-        visibleRows = [...topRows, ...middleRows];
-    }
+        return { visibleRows: visible, userIndex, total };
+    }, [leaderboard, user_id]);
 
     // Refs are used to auto-scroll to the current user
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -84,13 +79,10 @@ function ChessLeaderboard({
         if (userRowRef.current) {
             userRowRef.current.scrollIntoView({
                 behavior: "smooth",
-                block: "center", // 👈 centers vertically
+                block: "center",
             });
         }
-    }, [user_id]);
-
-
-    console.log('visibleRows final', visibleRows);
+    }, [user_id, data]);
 
     return (
         <div className="mb-6 w-full max-w-2xl mx-auto">

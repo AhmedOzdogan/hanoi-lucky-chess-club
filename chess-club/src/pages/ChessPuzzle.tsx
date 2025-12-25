@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useAttempt from "../hooks/useAttempt";
@@ -50,18 +50,20 @@ function ChessPuzzle() {
     // Elapsed time
     const { elapsed } = usePuzzleTimer(resetKey, movesEnabled);
 
-    // Displayed time
-    const displayElapsed = movesEnabled
-        ? elapsed
-        : user.puzzleStats?.time_seconds;
-
     // Attempts counter
     const { attempts, incrementAttempt } = useAttempt();
 
-    //Displayed attempts
-    const displayAttempts = movesEnabled
-        ? attempts
-        : user.puzzleStats?.attempt;
+    // Displayed time (memoized for stability)
+    const displayElapsed = useMemo(
+        () => (movesEnabled ? elapsed : user.puzzleStats?.time_seconds),
+        [movesEnabled, elapsed, user.puzzleStats?.time_seconds]
+    );
+
+    // Displayed attempts (memoized for stability)
+    const displayAttempts = useMemo(
+        () => (movesEnabled ? attempts : user.puzzleStats?.attempt),
+        [movesEnabled, attempts, user.puzzleStats?.attempt]
+    );
 
     // Leaderboard data
     const [puzzleStats, setPuzzleStats] = useState<ChessLeaderboardEntry[]>([]);
@@ -73,7 +75,10 @@ function ChessPuzzle() {
     const [statsError, setStatsError] = useState<string | null>(null);
 
     // Today’s puzzle date
-    const puzzleDate = new Date().toISOString().slice(0, 10);
+    const puzzleDate = useMemo(
+        () => new Date().toISOString().slice(0, 10),
+        []
+    );
 
 
     // Redirect if user is not logged in
@@ -83,20 +88,26 @@ function ChessPuzzle() {
             navigate("/login");
         }
     }, [user.loading, userId, navigate]);
+    // Prevent duplicate already-played notifications
+    const alreadyNotifiedRef = useRef(false);
 
     // Notify if user has already played today
     useEffect(() => {
+        if (alreadyNotifiedRef.current) return;
+
         if (!user.loading && user.puzzleStats) {
             toastInfo("You have already played today's puzzle. Come back tomorrow!");
             setMovesEnabled(false);
+            alreadyNotifiedRef.current = true;
             console.log("Moves disabled because user has already played today.");
         }
     }, [user.loading, user.puzzleStats]);
 
 
-    // Initialize puzzle engine when puzzle loads
+    // Initialize puzzle engine when puzzle loads (once per puzzleDate)
     useEffect(() => {
         if (!puzzle) return;
+        if (engineRef.current) return; // prevent re‑init
 
         engineRef.current = initPuzzleEngine(
             puzzle.game.pgn,
@@ -124,7 +135,7 @@ function ChessPuzzle() {
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [puzzle]);
+    }, [puzzleDate, puzzle]);
 
     // Reset timer when puzzle changes
     useEffect(() => {
@@ -234,19 +245,20 @@ function ChessPuzzle() {
     if (!fen) return null;
 
     return (
-        <div className="grow flex flex-col items-center">
-            <div className="w-full max-w-5xl mx-auto mt-6 mb-8">
+        <div className="grow flex flex-col items-center px-3 sm:px-0">
+            <div className="w-full max-w-5xl mx-auto mt-4 mb-6 sm:mt-6 sm:mb-8">
                 <div className="relative flex justify-center">
-                    <div className="flex items-center gap-3 bg-club-primary/20 px-8 py-4 rounded-xl border border-black/20 shadow-md">
-                        <h1 className="text-2xl font-semibold tracking-wide">
+                    <div className="flex items-center gap-3 bg-club-primary/20 px-4 py-3 sm:px-8 sm:py-4 rounded-xl border border-black/20 shadow-md">
+                        <h1 className="text-lg sm:text-2xl font-semibold tracking-wide text-center">
                             Daily Chess Puzzle - Rating : {puzzle?.puzzle.rating}
                         </h1>
                     </div>
                 </div>
             </div>
 
-            <div className="flex w-full max-w-270 justify-center items-start gap-12 mx-auto">
-                <div className="flex justify-center">
+            <div className="flex w-full max-w-270 flex-col md:flex-row justify-center items-start gap-6 md:gap-12 mx-auto">
+                {/* Board section - full width on mobile */}
+                <div className="flex justify-center w-full md:w-auto">
                     <ChessBoard
                         fen={fen}
                         onMove={handleMove}
@@ -254,8 +266,9 @@ function ChessPuzzle() {
                         movesEnabled={movesEnabled}
                     />
                 </div>
-                <div className="w-full max-w-md flex flex-col gap-4">
 
+                {/* Leaderboard / stats - below board on mobile, right side on desktop */}
+                <div className="w-full max-w-md flex flex-col gap-4 mt-6 md:mt-0">
                     {statsLoading && (
                         <div className="text-sm text-gray-500 text-center">
                             Loading leaderboard…
@@ -278,7 +291,8 @@ function ChessPuzzle() {
                             statsError={statsError}
                             displayElapsed={displayElapsed}
                             displayAttempts={displayAttempts}
-                            movesEnabled={movesEnabled} />
+                            movesEnabled={movesEnabled}
+                        />
                     )}
                 </div>
             </div>

@@ -1,6 +1,21 @@
 import { useEffect, useState, useRef } from "react";
 import { supabasePersistent } from "../utils/supabaseClient";
 
+const CACHE_KEY = "leaderboardCache_v1";
+
+function loadCache(): Record<LeaderboardType, LeaderboardRow[]> {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        return raw ? JSON.parse(raw) : { blitz: [], bullet: [], rapid: [], daily: [], "960": [], fide: [] };
+    } catch {
+        return { blitz: [], bullet: [], rapid: [], daily: [], "960": [], fide: [] };
+    }
+}
+
+function saveCache(cache: Record<LeaderboardType, LeaderboardRow[]>) {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+}
+
 type LeaderboardType =
     | "blitz"
     | "bullet"
@@ -43,14 +58,7 @@ function Leaderboard() {
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-    const cacheRef = useRef<Record<LeaderboardType, LeaderboardRow[]>>({
-        blitz: [],
-        bullet: [],
-        rapid: [],
-        daily: [],
-        "960": [],
-        fide: [],
-    });
+    const cacheRef = useRef<Record<LeaderboardType, LeaderboardRow[]>>(loadCache());
     const abortRef = useRef<AbortController | null>(null);
 
     // get current user id
@@ -65,9 +73,11 @@ function Leaderboard() {
         async function fetchLeaderboard() {
             setLoading(true);
 
-            // if cached → show instantly
-            if (cacheRef.current[type]) {
-                setRows(cacheRef.current[type]);
+            // If cached → show instantly (no waiting)
+            const cached = cacheRef.current[type];
+            if (cached && cached.length > 0) {
+                setRows(cached);
+                setLoading(false);
             }
 
             // cancel previous request
@@ -100,6 +110,7 @@ function Leaderboard() {
                 }));
 
                 cacheRef.current[type] = mapped;
+                saveCache(cacheRef.current);
                 setRows(mapped);
             }
 

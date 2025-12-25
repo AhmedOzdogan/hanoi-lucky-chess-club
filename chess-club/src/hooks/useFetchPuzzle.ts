@@ -47,7 +47,7 @@ function useFetchPuzzle() {
         };
 
         fetchPuzzle();
-    }, [url]);
+    }, []);
 
     return { puzzle, loading, error };
 }

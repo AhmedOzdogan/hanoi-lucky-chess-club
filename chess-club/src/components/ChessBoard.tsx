@@ -43,8 +43,14 @@ function ChessBoard({ fen, onMove, boardOrientation, movesEnabled = true }: Ches
         boardOrientation: boardOrientation ?? "white",
         allowDrawingArrows: true,
         animationDurationInMs: 400,
-        onSquareClick: () => { },
-
+        clearArrowsOnPositionChange: true,
+        clearHighlightsOnMove: true,
+        customDarkSquareStyle: {
+            backgroundColor: "#000000",
+        },
+        customLightSquareStyle: {
+            backgroundColor: "#EBD5AB",
+        },
     }), [fen, onMove, boardOrientation]);
 
     return <Chessboard options={options} />;
