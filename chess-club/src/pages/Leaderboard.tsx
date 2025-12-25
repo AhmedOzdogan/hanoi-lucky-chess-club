@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabasePersistent } from "../utils/supabaseClient";
 
 type LeaderboardType =
@@ -43,6 +43,16 @@ function Leaderboard() {
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+    const cacheRef = useRef<Record<LeaderboardType, LeaderboardRow[]>>({
+        blitz: [],
+        bullet: [],
+        rapid: [],
+        daily: [],
+        "960": [],
+        fide: [],
+    });
+    const abortRef = useRef<AbortController | null>(null);
+
     // get current user id
     useEffect(() => {
         supabasePersistent.auth.getUser().then(({ data }) => {
@@ -54,6 +64,15 @@ function Leaderboard() {
     useEffect(() => {
         async function fetchLeaderboard() {
             setLoading(true);
+
+            // if cached → show instantly
+            if (cacheRef.current[type]) {
+                setRows(cacheRef.current[type]);
+            }
+
+            // cancel previous request
+            abortRef.current?.abort();
+            abortRef.current = new AbortController();
 
             const { data, error } = await supabasePersistent
                 .from("chess_com_stats")
@@ -68,18 +87,20 @@ function Leaderboard() {
                 `)
                 .not("chess_com_name", "is", null)
                 .order(columnMap[type], { ascending: false })
-                .limit(50);
+                .limit(50)
+                .abortSignal(abortRef.current.signal);
 
             if (!error && data) {
-                setRows(
-                    data.map((row: any) => ({
-                        id: row.id,
-                        chess_com_name: row.chess_com_name,
-                        chess_com_title: row.chess_com_title,
-                        rating: row[columnMap[type]],
-                        profiles: row.profiles,
-                    }))
-                );
+                const mapped = data.map((row: any) => ({
+                    id: row.id,
+                    chess_com_name: row.chess_com_name,
+                    chess_com_title: row.chess_com_title,
+                    rating: row[columnMap[type]],
+                    profiles: row.profiles,
+                }));
+
+                cacheRef.current[type] = mapped;
+                setRows(mapped);
             }
 
             setLoading(false);
@@ -89,21 +110,23 @@ function Leaderboard() {
     }, [type]);
 
     return (
-        <div className="grow">
+        <div className="grow px-2 sm:px-0">
             {/* HEADER */}
             <div className="max-w-6xl mx-auto mb-6">
-                <h1 className="text-4xl font-bold text-center mb-4">
+                <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4">
                     Leaderboard
                 </h1>
 
                 {/* TABS */}
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-2 text-sm sm:text-base">
                     {leaderboardTabs.map((tab) => (
                         <button
                             key={tab.value}
+                            disabled={loading}
                             onClick={() => setType(tab.value)}
                             className={`
                                 px-4 py-2 rounded-lg border font-medium transition
+                                disabled:opacity-50 disabled:cursor-not-allowed
                                 ${type === tab.value
                                     ? "bg-club-primary text-club-dark border-club-secondary"
                                     : "border-club-secondary hover:bg-club-secondary/10"
@@ -117,18 +140,25 @@ function Leaderboard() {
             </div>
 
             {/* TABLE */}
-            <div className="max-w-6xl mx-auto bg-white rounded-xl border border-club-dark/20 shadow-sm overflow-x-auto">
-                <table className="w-full border-collapse">
+            <div className="max-w-6xl mx-auto bg-white rounded-lg sm:rounded-xl border border-club-dark/20 shadow-sm overflow-x-auto">
+                <table className="w-full border-collapse text-sm sm:text-base">
                     <thead className="bg-club-primary text-club-dark">
                         <tr>
-                            <th className="px-4 py-3 text-left w-16">#</th>
-                            <th className="px-4 py-3 text-left">Player</th>
-                            <th className="px-4 py-3 text-right">Rating</th>
+                            <th className="px-3 sm:px-4 py-2 sm:py-3 text-left w-16">#</th>
+                            <th className="px-3 sm:px-4 py-2 sm:py-3 text-left">Player</th>
+                            <th className="px-3 sm:px-4 py-2 sm:py-3 text-right">Rating</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {loading && (
+                        {loading && rows.length > 0 && (
+                            <tr>
+                                <td colSpan={3} className="py-3 text-center text-sm text-gray-500">
+                                    Updating…
+                                </td>
+                            </tr>
+                        )}
+                        {loading && rows.length === 0 && (
                             <tr>
                                 <td colSpan={3} className="py-8 text-center">
                                     Loading leaderboard...
@@ -170,15 +200,15 @@ function Leaderboard() {
                                     >
                                         {/* RANK */}
                                         <td
-                                            className={`px-4 py-3 font-bold ${rankColor}`}
+                                            className={`px-3 sm:px-4 py-2 sm:py-3 font-bold ${rankColor}`}
                                         >
                                             {index + 1}
                                         </td>
 
                                         {/* PLAYER */}
-                                        <td className="px-4 py-3">
+                                        <td className="px-3 sm:px-4 py-2 sm:py-3">
                                             <div className="flex items-center gap-2">
-                                                <span className="font-semibold">
+                                                <span className="font-semibold text-sm sm:text-base">
                                                     {row.profiles?.username ??
                                                         "-"}
                                                 </span>
@@ -196,14 +226,14 @@ function Leaderboard() {
                                                 )}
                                             </div>
 
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-[10px] sm:text-xs text-gray-500">
                                                 {row.chess_com_name}
                                             </div>
                                         </td>
 
                                         {/* RATING */}
-                                        <td className="px-4 py-3 text-right">
-                                            <span className="text-lg font-bold">
+                                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-right">
+                                            <span className="text-base sm:text-lg font-bold">
                                                 {row.rating ?? "-"}
                                             </span>
                                         </td>
