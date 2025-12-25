@@ -27,16 +27,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-
-          <Route path="/settings" element={<Settings />}>
-            <Route index element={<h2>Settings Overview</h2>} />
-            <Route path="reset-password" element={<ResetPassword />} />
-          </Route>
-
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/reset-password" element={<ResetPassword />} />
           <Route path="/chess-puzzles" element={<ChessPuzzle />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/members" element={<h1>Members</h1>} />
-          <Route path="/contact" element={<h1>Contact</h1>} />
+          <Route path="/Events" element={<h1>Events</h1>} />
         </Routes>
       </main>
 

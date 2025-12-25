@@ -7,8 +7,8 @@ type Status = "idle" | "loading" | "success" | "error"
 
 export function useChessUser() {
     const [status, setStatus] = useState<Status>("idle")
-    const [profile, setProfile] = useState<any>(null)
-    const [stats, setStats] = useState<any>(null)
+    const [profile, setProfile] = useState<ChessUser | null>(null)
+    const [stats, setStats] = useState<ChessStats | null>(null)
     const controllerRef = useRef<AbortController | null>(null)
 
     const reset = () => {

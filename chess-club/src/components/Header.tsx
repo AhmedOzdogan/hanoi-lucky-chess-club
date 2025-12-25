@@ -72,8 +72,7 @@ function Header() {
             <NavLinkItem to="/" label="Home" />
             <NavLinkItem to="/leaderboard" label="Leaderboard" />
             <NavLinkItem to="/chess-puzzles" label="Daily Puzzles" />
-            <NavLinkItem to="/members" label="Members" />
-            <NavLinkItem to="/contact" label="Contact" />
+            <NavLinkItem to="/events" label="Events" />
           </ol>
         </div>
 

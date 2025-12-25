@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import Input from '../components/Input';
 import ButtonPrimary from '../components/Button/ButtonPrimary';
@@ -7,18 +8,23 @@ import { useChangeUsername } from '../hooks/useChangeUsername';
 import type { ChessStats } from "../hooks/useUser";
 import ChessLoading from '../components/ChessboardComps/ChessLoading';
 import { checkUsernameAvailable } from '../utils/checkUsernameAvailable';
-import { toastSuccess } from '../utils/toastUtils';
+import { toastError, toastSuccess } from '../utils/toastUtils';
+import { useChessUser } from '../hooks/useChessUser';
+import updateChessStats from "../utils/UpdateChessStats";
 
 function Settings() {
+    const navigate = useNavigate();
     const user = useUser();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const chessStats = useRef<ChessStats>(user.chessStats);
+    const [chessUsername, setChessUsername] = useState("");
     useEffect(() => {
         if (!user.loading && user.profile && user.user) {
             setUsername(user.profile.username ?? '');
             setEmail(user.user.email ?? '');
             chessStats.current = user.chessStats;
+            setChessUsername(user.chessStats?.chess_com_name ?? '');
         }
     }, [user.loading]);
     const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
@@ -30,6 +36,10 @@ function Settings() {
         }
     }, [username]);
     const { changeUsername } = useChangeUsername();
+
+    const { status, profile, stats, checkUser } = useChessUser();
+
+
     if (user.loading) {
         return (
             <div className='flex flex-1'>
@@ -223,7 +233,8 @@ function Settings() {
                     </div>
 
                     <div className="pt-4 flex justify-center">
-                        <ButtonPrimary label="Reset Password" onClick={() => { }} />
+                        <ButtonPrimary label="Reset Password"
+                            onClick={() => { navigate("reset-password") }} />
                     </div>
                 </div>
 
@@ -283,20 +294,36 @@ function Settings() {
                             "
                         >
                             <Input
-                                value={chessStats.current?.chess_com_name || ''}
+                                value={chessUsername}
+                                placeholder='Chess.com Username'
                                 onChange={(e) => {
-                                    if (chessStats.current) {
-                                        chessStats.current.chess_com_name =
-                                            e.target.value;
-                                    }
+                                    setChessUsername(e.target.value);
                                 }}
+
                             />
 
                             <div className="w-full sm:w-auto">
                                 <ButtonPrimary
                                     label="Fetch Stats"
                                     onClick={async () => {
-                                        return;
+                                        await checkUser(chessUsername);
+                                        console.log("status:", status);
+
+                                        if (status === "success") {
+                                            await updateChessStats({
+                                                chess_com_name: profile?.username ?? "",
+                                                chess_com_player_id: profile?.player_id ?? 0,
+                                                chess_com_blitz: stats?.chess_blitz?.last?.rating ?? 1200,
+                                                chess_com_bullet: stats?.chess_bullet?.last?.rating ?? 1200,
+                                                chess_com_rapid: stats?.chess_rapid?.last?.rating ?? 1200,
+                                                chess_com_daily: stats?.chess_daily?.last?.rating ?? 1200,
+                                                chess_com_960_daily: stats?.chess960_daily?.last?.rating ?? 1200,
+                                                chess_com_title: profile?.title ?? undefined,
+                                                fide_rating: stats?.fide ?? 0,
+                                            });
+                                            console.log("Chess.com stats updated.");
+                                            toastSuccess("Chess.com stats updated successfully!");
+                                        }
                                     }}
                                 />
                             </div>
@@ -381,10 +408,6 @@ function Settings() {
                             </div>
                         ))}
                     </div>
-                </div>
-
-                <div className="pt-8 border-t border-black/20 flex justify-center">
-                    <Outlet />
                 </div>
             </div>
         </div>
