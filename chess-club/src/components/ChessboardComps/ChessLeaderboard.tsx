@@ -85,11 +85,11 @@ function ChessLeaderboard({
     }, [user_id, data]);
 
     return (
-        <div className="mb-6 w-full max-w-2xl mx-auto">
-            <div className="bg-club-light/60 border border-black/20 rounded-2xl p-6 shadow-lg">
+        <div className="mb-6 w-full max-w-2xl mx-auto justify-center items-center flex px-2 sm:px-0">
+            <div className="bg-club-light/60 border border-black/20 rounded-2xl p-4 sm:p-6 shadow-lg w-full">
 
                 {/* ===== Your Stats ===== */}
-                <div className="mb-6 p-4 ">
+                <div className="mb-6 p-3 sm:p-4">
                     <p className="mb-3 text-lg font-bold text-center">Your Stats</p>
 
                     {!movesEnabled && (
@@ -98,8 +98,8 @@ function ChessLeaderboard({
                         </p>
                     )}
 
-                    <div className="flex justify-center gap-6">
-                        <div className="flex flex-col gap-1 px-6 py-3 rounded-xl border border-black/20 bg-[#f3e7c4] shadow-sm w-40">
+                    <div className="flex justify-center content-center items-center gap-4 sm:gap-6 flex-wrap sm:flex-nowrap w-full text-center">
+                        <div className="flex flex-col gap-1 px-4 py-3 rounded-xl border border-black/20 bg-[#f3e7c4] shadow-sm w-36 sm:w-40">
                             <span className="text-xs uppercase text-gray-600 text-left">
                                 Time Elapsed
                             </span>
@@ -109,7 +109,7 @@ function ChessLeaderboard({
                             </span>
                         </div>
 
-                        <div className="flex flex-col gap-1 px-6 py-3 rounded-xl border border-black/20 bg-[#f3e7c4] shadow-sm w-40">
+                        <div className="flex flex-col gap-1 px-4 py-3 rounded-xl border border-black/20 bg-[#f3e7c4] shadow-sm w-36 sm:w-40">
                             <span className="text-xs uppercase text-gray-600 text-left">
                                 Total Mistakes
                             </span>
@@ -121,7 +121,7 @@ function ChessLeaderboard({
                 </div>
 
                 {/* ===== Leaderboard ===== */}
-                <h2 className="text-lg font-semibold mb-4 text-center">
+                <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-center">
                     Daily Leaderboard
                 </h2>
 
@@ -146,7 +146,7 @@ function ChessLeaderboard({
                 {/* Enables vertical scrolling only */}
                 <div
                     ref={containerRef}
-                    className="flex flex-col gap-2 max-h-70 overflow-y-auto overflow-x-hidden">
+                    className="flex flex-col gap-2 max-h-65 sm:max-h-72 overflow-y-auto overflow-x-hidden overscroll-contain border border-black rounded-2xl ">
                     {visibleRows.map((entry, index) => {
                         const isCurrentUser = user_id === entry.user_id;
 
@@ -155,10 +155,10 @@ function ChessLeaderboard({
                             <div
                                 ref={isCurrentUser ? userRowRef : null}
                                 key={entry.solved_at}
-                                className={`flex items-center gap-4 rounded-lg px-4 py-3 text-sm shadow-inner border
+                                className={`flex items-center gap-3 sm:gap-4 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm shadow-inner
                                         ${isCurrentUser
-                                        ? "bg-club-secondary font-semibold border-black scale-[1.02]"
-                                        : "bg-[#ead9ad] border-black/10"
+                                        ? "bg-club-secondary font-semibold scale-[1.02]"
+                                        : "bg-[#ead9ad]"
                                     }`}
                             >
                                 {/* Rank */}
@@ -168,7 +168,7 @@ function ChessLeaderboard({
 
                                 {/* Username */}
                                 <div
-                                    className={`flex-1 truncate ${isCurrentUser ? "text-center" : ""
+                                    className={`flex-1 truncate text-xs sm:text-sm ${isCurrentUser ? "text-center" : ""
                                         }`}
                                 >
                                     {entry.profiles.username}
@@ -181,7 +181,7 @@ function ChessLeaderboard({
                                 </div>
 
                                 {/* Attempts */}
-                                <div className="w-20 text-right text-gray-700">
+                                <div className="w-20 text-right text-gray-700 text-xs sm:text-sm">
                                     {entry.attempt} tries
                                 </div>
                             </div>
