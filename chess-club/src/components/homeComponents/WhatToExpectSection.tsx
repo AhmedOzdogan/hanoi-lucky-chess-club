@@ -12,7 +12,7 @@ function WhatToExpectSection() {
             </h2 >
 
             <div className="max-w-4xl flex flex-row gap-6 text-gray-800 text-lg leading-relaxed">
-                <img src={image} alt="Chess banner" className="w-1/2" />
+                <img src={image} alt="Chess banner" className="w-1/2 rounded-2xl" />
                 <div className="w-1/2">
                     <p className="mb-4 font-serif text-justify">
                         At Hanoi Lucky Chess Club, we welcome players of all skill levels, from absolute beginners to seasoned

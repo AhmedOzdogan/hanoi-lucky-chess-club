@@ -16,7 +16,7 @@ function WhoCanJoinSection() {
                         className="rounded-xl shadow-lg object-cover"
                     />
                     <p className="text-sm italic text-center mt-2 font-serif">
-                        Samuel Reshevsky, the child in this pic, defeating several chess masters at once in France, C. 1920
+                        Samuel Reshevsky, who is playing against 20 grandmasters simultaneously in 1920. He won 19 and lost 1. <span className='font-bold'>Age is a number when it comes to chess!</span>
                     </p>
                 </div>
                 <div className="flex-col w-full md:w-1/2 items-start flex gap-4">
