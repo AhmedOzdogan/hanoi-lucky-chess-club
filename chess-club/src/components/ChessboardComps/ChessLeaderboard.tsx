@@ -146,64 +146,66 @@ function ChessLeaderboard({
                 )}
 
                 {/* Enables vertical scrolling only */}
-                <div
-                    ref={containerRef}
-                    className="flex flex-col gap-2 px-4 py-5 max-h-65 sm:max-h-72 overflow-y-auto overflow-x-hidden overscroll-contain border rounded-sm overflow-hidden"
-                >
-                    {visibleRows.map((entry, index) => {
-                        const isCurrentUser = user_id === entry.user_id;
+                {visibleRows.length > 0 && (
+                    <div
+                        ref={containerRef}
+                        className="flex flex-col gap-2 px-4 py-5 max-h-65 sm:max-h-72 overflow-y-auto overflow-x-hidden overscroll-contain overflow-hidden"
+                    >
+                        {visibleRows.map((entry, index) => {
+                            const isCurrentUser = user_id === entry.user_id;
 
-                        return (
-                            // Marks the current user row for scrolling
-                            <div
-                                ref={isCurrentUser ? userRowRef : null}
-                                key={entry.solved_at}
-                                className={`flex items-center gap-3 sm:gap-4 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm shadow-inner
-                                        ${isCurrentUser
-                                        ? "bg-club-secondary font-semibold scale-[1.02]"
-                                        : "bg-[#ead9ad]"
-                                    }`}
-                            >
-                                {/* Rank */}
-                                <div className="w-6 text-center font-semibold flex flex-row justify-center items-center">
-
-
-                                    {index === 0 && (
-                                        <FontAwesomeIcon className="inline mr-1 text-yellow-400" icon={faCrown} />
-                                    )}
-
-                                    {index === 1 && (
-                                        <FontAwesomeIcon className="inline mr-1 text-gray-400" icon={faCrown} />
-                                    )}
-
-                                    {index === 2 && (
-                                        <FontAwesomeIcon className="inline mr-1 text-[#cd7f32]" icon={faCrown} />
-                                    )}
-                                    {leaderboard.findIndex((e) => e.user_id === entry.user_id) + 1}
-                                </div>
-
-                                {/* Username */}
+                            return (
+                                // Marks the current user row for scrolling
                                 <div
-                                    className={`flex-1 truncate text-xs sm:text-sm ${isCurrentUser ? "text-center" : ""
+                                    ref={isCurrentUser ? userRowRef : null}
+                                    key={entry.solved_at}
+                                    className={`flex items-center gap-3 sm:gap-4 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm shadow-inner
+                                        ${isCurrentUser
+                                            ? "bg-club-secondary font-semibold scale-[1.02]"
+                                            : "bg-[#ead9ad]"
                                         }`}
                                 >
-                                    {entry.profiles.username}
-                                </div>
+                                    {/* Rank */}
+                                    <div className="w-6 text-center font-semibold flex flex-row justify-center items-center">
 
-                                {/* Time */}
-                                <div className="w-16 text-right font-mono">
-                                    {Math.floor(entry.time_seconds / 60)}:
-                                    {String(entry.time_seconds % 60).padStart(2, "0")}
-                                </div>
 
-                                {/* Attempts */}
-                                <div className="w-20 text-right text-gray-700 text-xs sm:text-sm">
-                                    {entry.attempt} tries
+                                        {index === 0 && (
+                                            <FontAwesomeIcon className="inline mr-1 text-yellow-400" icon={faCrown} />
+                                        )}
+
+                                        {index === 1 && (
+                                            <FontAwesomeIcon className="inline mr-1 text-gray-400" icon={faCrown} />
+                                        )}
+
+                                        {index === 2 && (
+                                            <FontAwesomeIcon className="inline mr-1 text-[#cd7f32]" icon={faCrown} />
+                                        )}
+                                        {leaderboard.findIndex((e) => e.user_id === entry.user_id) + 1}
+                                    </div>
+
+                                    {/* Username */}
+                                    <div
+                                        className={`flex-1 truncate text-xs sm:text-sm ${isCurrentUser ? "text-center" : ""
+                                            }`}
+                                    >
+                                        {entry.profiles.username}
+                                    </div>
+
+                                    {/* Time */}
+                                    <div className="w-16 text-right font-mono">
+                                        {Math.floor(entry.time_seconds / 60)}:
+                                        {String(entry.time_seconds % 60).padStart(2, "0")}
+                                    </div>
+
+                                    {/* Attempts */}
+                                    <div className="w-20 text-right text-gray-700 text-xs sm:text-sm">
+                                        {entry.attempt} tries
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
