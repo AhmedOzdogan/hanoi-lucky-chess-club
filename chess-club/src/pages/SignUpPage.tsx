@@ -28,12 +28,23 @@ function SignUpPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [passwordAgain, setPasswordAgain] = useState("");
+    const [signedUser, setSignedUser] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
-    const [signingUp, setSigningUp] = useState(false);
 
 
     const { status, validateEmail, reset } = useEmailValidation();
+
+    useEffect(() => {
+        if (step !== 3) return;
+        const checkSignedUser = async () => {
+            const {
+                data: { user },
+            } = await supabasePersistent.auth.getUser();
+            setSignedUser(user?.id || "");
+        };
+        checkSignedUser();
+    }, [step]);
 
     const {
         status: chessStatus,
@@ -65,7 +76,6 @@ function SignUpPage() {
         }
 
         try {
-            setSigningUp(true);
             const usernameAvailable = await checkUsernameAvailable(username);
             if (!usernameAvailable) {
                 toastError("Username is already taken. Please choose another.");
@@ -79,7 +89,6 @@ function SignUpPage() {
                 toastError("Sign up failed. Email may already be in use. Please try again!");
             }
         } finally {
-            setSigningUp(false);
         }
     }
 
@@ -114,6 +123,7 @@ function SignUpPage() {
             rememberMe: true,
         });
 
+
         if (!success) {
             toastError("Please verify your email before continuing.");
             return;
@@ -124,8 +134,12 @@ function SignUpPage() {
     }
 
     async function handleCheckChessUser() {
+        // allow retry flow
+        setChessSaveState("idle");
+
         resetChessUser();
-        checkUser(chessUsername);
+        await checkUser(chessUsername);
+        console.log("Checked chess user");
     }
 
     const [chessSaveState, setChessSaveState] = useState<
@@ -136,24 +150,29 @@ function SignUpPage() {
             chessStatus !== "success" ||
             !profile ||
             !stats ||
-            chessSaveState !== "idle"
+            chessSaveState === "saving"
         ) {
             return;
         }
 
         async function saveChessStats() {
             setChessSaveState("saving");
+            console.log("Saving chess stats...");
+            console.log({ profile, stats });
+
+
 
             const success = await updateChessStats({
-                chess_com_name: profile.username,
-                chess_com_player_id: profile.player_id,
-                chess_com_blitz: stats.chess_blitz.last.rating,
-                chess_com_bullet: stats.chess_bullet.last.rating,
-                chess_com_rapid: stats.chess_rapid.last.rating,
-                chess_com_daily: stats.chess_daily.last.rating,
-                chess_com_960_daily: stats.chess960_daily.last.rating,
-                chess_com_title: profile.title,
-                fide_rating: stats.fide?.rating,
+                user_id: signedUser || "",
+                chess_com_name: profile?.username || "",
+                chess_com_player_id: profile?.player_id || 0,
+                chess_com_blitz: stats?.chess_blitz?.last.rating || 0,
+                chess_com_bullet: stats?.chess_bullet?.last.rating || 0,
+                chess_com_rapid: stats?.chess_rapid?.last.rating || 0,
+                chess_com_daily: stats?.chess_daily?.last.rating || 0,
+                chess_com_960_daily: stats?.chess960_daily?.last.rating || 0,
+                chess_com_title: profile?.title || undefined,
+                fide_rating: stats?.fide || undefined,
             });
 
             if (!success) {
@@ -311,17 +330,13 @@ function SignUpPage() {
                                 <ButtonPrimary
                                     label={
                                         chessStatus === "success"
-                                            ? "Finish"
+                                            ? "Save & Finish"
                                             : chessStatus === "loading"
                                                 ? "Checking..."
                                                 : "Check"
                                     }
                                     size="sm"
-                                    onClick={
-                                        chessStatus === "success"
-                                            ? () => navigate("/")
-                                            : handleCheckChessUser
-                                    }
+                                    onClick={handleCheckChessUser}
                                 />
                             </div>
                         </div>

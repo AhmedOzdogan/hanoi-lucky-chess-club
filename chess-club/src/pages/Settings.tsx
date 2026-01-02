@@ -28,17 +28,44 @@ function Settings() {
             setChessUsername(user.chessStats?.chess_com_name ?? '');
         }
     }, [user.loading]);
+
     const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
     const [checkingUsername, setCheckingUsername] = useState(false);
     const [usernameChanged, setUsernameChanged] = useState<boolean>(false);
+
     useEffect(() => {
         if (username !== (user.profile?.username ?? '')) {
             setIsUsernameAvailable(null);
         }
     }, [username]);
+
     const { changeUsername } = useChangeUsername();
 
     const { status, profile, stats, checkUser } = useChessUser();
+
+    useEffect(() => {
+        if (status !== "success") return;
+        const updateStats = async () => {
+            if (status === "success") {
+                console.log("Fetched Chess.com profile and stats:", profile, stats);
+                await updateChessStats({
+                    user_id: user.user?.id || "",
+                    chess_com_name: profile?.username ?? "",
+                    chess_com_player_id: profile?.player_id ?? 0,
+                    chess_com_blitz: stats?.chess_blitz?.last?.rating ?? 1200,
+                    chess_com_bullet: stats?.chess_bullet?.last?.rating ?? 1200,
+                    chess_com_rapid: stats?.chess_rapid?.last?.rating ?? 1200,
+                    chess_com_daily: stats?.chess_daily?.last?.rating ?? 1200,
+                    chess_com_960_daily: stats?.chess960_daily?.last?.rating ?? 1200,
+                    chess_com_title: profile?.title ?? undefined,
+                    fide_rating: stats?.fide ?? 0,
+                });
+                console.log("Chess.com stats updated.");
+                toastSuccess("Chess.com stats updated successfully! Please refresh to see the latest stats.");
+            }
+        };
+        updateStats();
+    }, [status]);
 
 
     if (user.loading) {
@@ -225,7 +252,7 @@ function Settings() {
                                             } finally {
                                                 setCheckingUsername(false);
                                                 setUsernameChanged(true);
-                                                toastSuccess("Username changed successfully to " + username + "!");
+                                                toastSuccess("Username changed successfully to " + username + "! Please refresh to see the latest username.");
                                             }
                                         }}
                                         disabled={
@@ -366,26 +393,14 @@ function Settings() {
 
                             <div className="w-full sm:w-auto">
                                 <ButtonPrimary
-                                    label="Fetch Stats"
+                                    label={status === "loading" ? "Please wait..." : status === "success" ? "Done!" : "Change Username"}
+                                    disabled={status === "loading"}
                                     onClick={async () => {
                                         await checkUser(chessUsername);
-                                        console.log("status:", status);
-
-                                        if (status === "success") {
-                                            await updateChessStats({
-                                                chess_com_name: profile?.username ?? "",
-                                                chess_com_player_id: profile?.player_id ?? 0,
-                                                chess_com_blitz: stats?.chess_blitz?.last?.rating ?? 1200,
-                                                chess_com_bullet: stats?.chess_bullet?.last?.rating ?? 1200,
-                                                chess_com_rapid: stats?.chess_rapid?.last?.rating ?? 1200,
-                                                chess_com_daily: stats?.chess_daily?.last?.rating ?? 1200,
-                                                chess_com_960_daily: stats?.chess960_daily?.last?.rating ?? 1200,
-                                                chess_com_title: profile?.title ?? undefined,
-                                                fide_rating: stats?.fide ?? 0,
-                                            });
-                                            console.log("Chess.com stats updated.");
-                                            toastSuccess("Chess.com stats updated successfully!");
+                                        if (status === 'error') {
+                                            toastError("Failed to fetch Chess.com data or username in use. Please check the username.");
                                         }
+
                                     }}
                                 />
                             </div>

@@ -34,7 +34,7 @@ export function useUser() {
     const [authUser, setAuthUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [chessStats, setChessStats] = useState<ChessStats | null>(null);
-    const [puzzleStats, setPuzzleStats] = useState<any>(null);
+    const [puzzleStats, setPuzzleStats] = useState<PuzzleStats | null>(null);
     const [loading, setLoading] = useState(true);
 
     async function loadUser() {
@@ -103,8 +103,7 @@ export function useUser() {
             .select("*")
             .eq("user_id", user.id)
             .eq("puzzle_date", today)
-            .single()
-            .returns<PuzzleStats>();
+            .maybeSingle<PuzzleStats>();
 
         if (profileError || chessError || puzzleError) {
             console.error(
@@ -117,7 +116,7 @@ export function useUser() {
 
         setProfile(profileData ?? null);
         setChessStats(chessData ?? null);
-        setPuzzleStats(puzzleData ?? null);
+        setPuzzleStats(puzzleData || null);
         setLoading(false);
     }
 
