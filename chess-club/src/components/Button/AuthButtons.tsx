@@ -3,7 +3,6 @@ import { useUser } from "../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import {
     FaChessKing,
-    FaChessQueen,
     FaChessRook,
     FaChessKnight,
     FaChevronDown,
@@ -71,7 +70,7 @@ function AuthButtons({ mobile = false, onAction }: AuthButtonsProps) {
             <div className="flex flex-col gap-3">
                 <button
                     onClick={() => {
-                        navigate("/dashboard");
+                        navigate("/settings");
                         onAction?.();
                     }}
                     className="
@@ -83,8 +82,8 @@ function AuthButtons({ mobile = false, onAction }: AuthButtonsProps) {
                     hover:bg-club-light
                 "
                 >
-                    <FaChessQueen className="text-lg" />
-                    <span>Dashboard</span>
+                    <FaChessRook className="text-lg" />
+                    <span>Settings</span>
                 </button>
 
                 <button
@@ -131,16 +130,6 @@ function AuthButtons({ mobile = false, onAction }: AuthButtonsProps) {
 
             {open && (
                 <div className="absolute right-0 mt-2 w-48 rounded-xl border border-club-dark/20 bg-white shadow-lg overflow-hidden z-50">
-                    <button
-                        onClick={() => {
-                            setOpen(false);
-                            navigate("/dashboard");
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-club-light"
-                    >
-                        <FaChessQueen />
-                        <span>Dashboard</span>
-                    </button>
 
                     <button
                         onClick={() => {

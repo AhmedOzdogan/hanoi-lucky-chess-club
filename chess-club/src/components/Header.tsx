@@ -38,7 +38,7 @@ function Header() {
           <MobileNavLink to="/" label="Home" setOpen={setOpen} />
           <MobileNavLink to="/leaderboard" label="Leaderboard" setOpen={setOpen} />
           <MobileNavLink to="/chess-puzzles" label="Daily Puzzles" setOpen={setOpen} />
-          <MobileNavLink to="/events" label="Events" setOpen={setOpen} />
+          <MobileNavLink to="/contact" label="Contact" setOpen={setOpen} />
 
           <AuthButtons mobile onAction={() => setOpen(false)} />
         </ol>
@@ -71,7 +71,7 @@ function Header() {
             <NavLinkItem to="/" label="Home" />
             <NavLinkItem to="/leaderboard" label="Leaderboard" />
             <NavLinkItem to="/chess-puzzles" label="Daily Puzzles" />
-            <NavLinkItem to="/events" label="Events" />
+            <NavLinkItem to="/contact" label="Contact" />
           </ol>
         </div>
 

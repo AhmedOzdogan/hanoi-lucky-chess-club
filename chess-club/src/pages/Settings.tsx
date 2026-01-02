@@ -407,12 +407,12 @@ function Settings() {
                         </div>
                     </div>
 
-                    <div className="w-full">
+                    <div className="min-w-full">
                         <p
                             className="
-                                w-full
+                                min-w-full
                                 m-0
-                                text-[10px]
+                                text-shadow-md
                                 sm:text-base
                                 text-gray-800
                                 bg-club-light/60
@@ -423,6 +423,7 @@ function Settings() {
                                 border-2
                                 border-black/20
                                 leading-relaxed
+                                text-center
                             "
                         >
                             Default stats are shown as

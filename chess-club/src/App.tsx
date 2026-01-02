@@ -9,6 +9,7 @@ import ResetPassword from './components/ResetPassword';
 import ChessPuzzle from './pages/ChessPuzzle';
 import Leaderboard from './pages/Leaderboard';
 import Settings from './pages/Settings';
+import Contact from './pages/Contact';
 
 
 import ToastContainer from './components/Toast/ToastContainer';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/settings/reset-password" element={<ResetPassword />} />
           <Route path="/chess-puzzles" element={<ChessPuzzle />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/Events" element={<h1>Events</h1>} />
         </Routes>
       </main >

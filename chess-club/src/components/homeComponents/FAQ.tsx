@@ -1,8 +1,10 @@
 import { useState } from "react";
+//import { useNavigate } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa";
 import { useInView } from "../../hooks/useInView";
 
 function FAQ() {
+    //const navigate = useNavigate();
     const { ref, inView } = useInView(0.3);
 
     const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -22,7 +24,8 @@ function FAQ() {
         },
         {
             q: "Where do you play?",
-            a: "We play at Horizon Coffee in Phung Khoang, Ha Dong, Hanoi, a cozy, friendly venue with plenty of space, good lighting, and great drinks."
+            a: "We play at Horizon Coffee in Phung Khoang, Ha Dong, Hanoi, a cozy, friendly venue with plenty of space, good lighting, and great drinks.",
+            link: "location"
         },
         {
             q: "Is there a membership fee?",
@@ -75,15 +78,18 @@ function FAQ() {
         {
             q: "Can I practice English and make new friends by playing chess with you?",
             a: "Our chess club members often gather for lunch before the meetings and/or dinner afterward and practice our English while making new English-speaking friends from the USA, England, Australia, France, Germany, and African, Asian and Latin American countries."
-        },
-        {
-            q: "How can I make a financial contribution to the Hanoi Lucky Chess Club?",
-            a: "You can donate to HLCC using the following QR code:"
-        },
-        {
-            q: "Does the chess club accept sponsors?",
-            a: "Anyone can help sponsor the chess club by purchasing an advertisement on the club website or by donating at the above QR code."
         }
+        // {
+        //     q: "How can I make a financial contribution to the Hanoi Lucky Chess Club?",
+        //     a: "We appreciate financial contributions to help cover our operating costs. Please contact Francis Lloyd Holland.",
+        //     navigate: "Contact"
+        // },
+        // {
+        //     q: "Does the chess club accept sponsors?",
+        //     a: "Anyone can help sponsor the chess club by purchasing an advertisement on the club website or by donating. Francis Lloyd Holland can provide more information.",
+        //     navigate: "Contact"
+        // }
+        // Tax reasons adjust later
     ];
 
     return (
@@ -119,9 +125,21 @@ function FAQ() {
                                 : "max-h-0 px-5"
                                 }`}
                         >
-                            <p className="text-gray-700">
+                            <p className="text-gray-700 min-w-full">
                                 {item.a}
                             </p>
+
+                            {item.link && (
+                                <a href={`#${item.link}`} className="text-club-primary font-bold hover:underline mt-2 inline-block">Check the {item.link}</a>
+                            )}
+                            {/*{item.navigate && (
+                                <button
+                                    onClick={() => navigate(`/${item.navigate.toLowerCase()}`)}
+                                    className="text-club-primary font-bold hover:underline mt-2 inline-block"
+                                >
+                                    Go to {item.navigate}
+                                </button>
+                            )}*/}
                         </div>
                     </div>
                 ))}
