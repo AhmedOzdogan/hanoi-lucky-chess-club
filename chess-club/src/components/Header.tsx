@@ -11,11 +11,13 @@ function Header() {
     <>
       {/* ================= MOBILE HEADER ================= */}
       <header className="relative z-50 w-full h-20 px-4 bg-club-primary text-club-dark flex items-center justify-between lg:hidden">
-        <img
-          src="/logo.png"
-          alt="Club Logo"
-          className="h-14 w-14 rounded-full border-2 border-club-secondary"
-        />
+        <NavLink to="/">
+          <img
+            src="/logo_smaller.png"
+            alt="Club Logo"
+            className="h-14 w-14 rounded-full border-2 border-club-secondary"
+          />
+        </NavLink>
 
         <button
           onClick={() => setOpen((v) => !v)}
@@ -48,14 +50,16 @@ function Header() {
       <header className="relative z-50 hidden lg:grid w-full min-w-full h-40 grid-cols-[260px_1fr_260px] grid-rows-2 items-center bg-club-primary text-club-dark px-6">
         {/* LEFT — LOGO */}
         <div className="row-span-2 flex items-center gap-4">
-          <div className="relative">
-            <img
-              src="/logo.png"
-              alt="Club Logo"
-              className="h-24 w-24 rounded-full border-4 border-club-secondary"
-            />
-            <FaChessPawn className="absolute -bottom-2 -right-2 text-2xl text-club-secondary" />
-          </div>
+          <NavLink to="/">
+            <div className="relative">
+              <img
+                src="/logo.png"
+                alt="Club Logo"
+                className="h-24 w-24 rounded-full border-4 border-club-secondary"
+              />
+              <FaChessPawn className="absolute -bottom-2 -right-2 text-2xl text-club-secondary" />
+            </div>
+          </NavLink>
         </div>
 
         {/* CENTER — TITLE */}
