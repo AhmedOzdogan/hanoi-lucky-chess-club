@@ -40,8 +40,6 @@ function ChessLeaderboard({
 
     const {
         visibleRows,
-        userIndex,
-        total
     } = useMemo(() => {
         const WINDOW = 5;
         const total = leaderboard.length;

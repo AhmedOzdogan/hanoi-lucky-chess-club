@@ -19,7 +19,7 @@ import {
 } from "../utils/puzzleEngine";
 
 import { getPuzzleStats, updatePuzzleStats } from "../utils/puzzleStats";
-import { toastError, toastSuccess, toastInfo } from "../utils/toastUtils";
+import { toastError } from "../utils/toastUtils";
 
 function ChessPuzzle() {
     const navigate = useNavigate();

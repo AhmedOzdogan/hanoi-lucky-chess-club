@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { supabasePersistent } from "../utils/supabaseClient";
 import { getActiveClient } from "../utils/getActiveClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRocket, faFire, faCalendar, faShuffle, faGlobe, faCrown } from "@fortawesome/free-solid-svg-icons";
