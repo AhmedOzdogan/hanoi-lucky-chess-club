@@ -16,10 +16,12 @@ function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [loginProcessing, setLoginProcessing] = useState<"idle" | "loading" | "success">("idle");
     const [loggedIn, setLoggedIn] = useState(true);
     const { Captcha, runWithCaptcha } = useCaptchaGuard();
 
     async function handleLogin() {
+        setLoginProcessing("loading");
         try {
             await runWithCaptcha(async () => {
                 const success = await login({
@@ -31,10 +33,12 @@ function LoginPage() {
                 if (success) {
                     toastSuccess("Login successful!");
                     navigate("/");
+                    setLoginProcessing("success");
                 }
             });
         } catch (err) {
             console.error("Captcha or login failed:", err);
+            setLoginProcessing("idle");
         }
     }
 
@@ -110,7 +114,7 @@ function LoginPage() {
                     {Captcha}
 
                     {/* Primary action */}
-                    <ButtonPrimary label="Login" size="lg" onClick={handleLogin} />
+                    <ButtonPrimary label={loginProcessing === "loading" ? "Logging in..." : "Login"} size="lg" onClick={handleLogin} disabled={loginProcessing === "loading"} />
 
                     {/* Divider */}
                     <div className="flex items-center my-2">
