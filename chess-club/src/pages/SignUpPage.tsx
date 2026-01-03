@@ -23,7 +23,7 @@ import { useCaptchaGuard } from "../hooks/useCaptchaGuard";
 import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
-    const [step, setStep] = useState(2);
+    const [step, setStep] = useState(1);
     const navigate = useNavigate();
     const { Captcha, runWithCaptcha } = useCaptchaGuard();
 
