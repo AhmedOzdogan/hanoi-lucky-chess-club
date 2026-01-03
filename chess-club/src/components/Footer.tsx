@@ -3,7 +3,7 @@ import { SiZalo } from "react-icons/si";
 
 function Footer() {
   return (
-    <footer className="w-full bg-club-primary text-club-dark mt-4 shadow-inner shadow-club-dark/20  ">
+    <footer className="w-full bg-club-primary text-club-dark shadow-inner shadow-club-dark/20 py-6 ">
       <div
         className="
           mx-auto w-full
@@ -40,7 +40,7 @@ function Footer() {
             aria-label="Zalo"
             className="hover:text-club-secondary transition-transform hover:scale-110 pr-5"
           >
-            <SiZalo className="h-6 w-6 md:h-9 md:w-9" />
+            <SiZalo className="h-8 w-8" />
           </a>
 
           <a
@@ -50,7 +50,7 @@ function Footer() {
             aria-label="Facebook"
             className="hover:text-club-secondary transition-transform hover:scale-110"
           >
-            <FaFacebook className="h-6 w-6 md:h-9 md:w-9" />
+            <FaFacebook className="h-8 w-8" />
           </a>
         </div>
       </div>

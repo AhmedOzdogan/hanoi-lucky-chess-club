@@ -83,7 +83,8 @@ function ClubInfoSection() {
                         {/* Google Map */}
                         <div className="w-full h-72 rounded-xl overflow-hidden border border-black/20 shadow">
                             <iframe
-                                src="https://www.google.com/maps?q=Horizon%20Coffee%20-%20relax%20%26%20working%20space%20-%20Ph%C3%B9ng%20Khoang&hl=en&z=14&output=embed"
+                                title="Horizon Coffee - relax & working space "
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.140672173335!2d105.7925366!3d20.986997499999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135adf78f3b2201%3A0x8f938a65b0ba1b2d!2sHorizon%20Coffee%20-%20relax%20%26%20working%20space%20-%20Ph%C3%B9ng%20Khoang!5e0!3m2!1str!2s!4v1767426579217!5m2!1str!2s"
                                 width="100%"
                                 height="100%"
                                 loading="lazy"

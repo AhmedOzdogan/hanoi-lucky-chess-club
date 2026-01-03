@@ -1,4 +1,3 @@
-import image from '../../assets/homePage/chessbanner2.jpg';
 import { useInView } from '../../hooks/useInView';
 function WhoCanJoinSection() {
     const { ref, inView } = useInView(0.3);
@@ -11,10 +10,13 @@ function WhoCanJoinSection() {
             <div className="flex flex-col md:flex-row max-w-5xl mx-auto text-gray-800 gap-2 md:gap-6 items-center md:items-start ">
                 <div className="flex-col w-full md:w-1/2">
                     <img
-                        src={image}
-                        alt="Chess club banner"
+                        src='/banner/banner2-1200.webp'
                         className="rounded-xl shadow-lg object-cover"
-                    />
+                        srcSet={`/banner/banner2-800.webp 800w, /banner/banner2-1200.webp 1200w, /banner/banner2-1920.webp 1920w`}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        alt="Chess banner with Samuel Reshevsky playing against 20 grandmasters simultaneously in 1920"
+                        loading='lazy' />
+
                     <p className="mx-auto justify-center text-sm italic text-center mt-2 font-serif">
                         Samuel Reshevsky, who is playing against 20 grandmasters simultaneously in 1920. He won 19 and lost 1. <span className='font-bold'>Age is a number when it comes to chess!</span>
                     </p>

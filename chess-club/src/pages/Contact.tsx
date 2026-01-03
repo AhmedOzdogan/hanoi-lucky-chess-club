@@ -38,7 +38,7 @@ function Contact() {
                 {/* Card 1 */}
                 <div className="bg-club-secondary rounded-xl shadow-xl p-10 w-full max-w-2xl text-center border min-h-120">
                     <h2 className="text-2xl font-bold mb-4">General Contact</h2>
-                    <img src={francis} alt="Francis' Profile Picture" className="w-64 h-64 mx-auto mb-4 rounded-full" />
+                    <img src={francis} alt="Francis' Profile Picture" className="w-64 h-64 mx-auto mb-4 rounded-full" loading='lazy' />
                     <p className="text-club-dark text-xl mb-2">
                         <strong>Email:</strong>
                         <a href="mailto:francislholland@gmail.com" className="ml-1 hover:underline">
@@ -56,7 +56,7 @@ function Contact() {
                 {/* Card 2 */}
                 <div className="bg-club-secondary rounded-xl shadow-xl p-10 w-full max-w-2xl text-center border min-h-120">
                     <h2 className="text-2xl font-bold mb-4">Club & Events</h2>
-                    <img src={hai} alt="Hanoi Lucky Chess Club" className="w-64 h-64 mx-auto mb-4 rounded-full" />
+                    <img src={hai} alt="Hanoi Lucky Chess Club" className="w-64 h-64 mx-auto mb-4 rounded-full" loading='lazy' />
                     <p className="text-club-dark text-xl mb-2">
                         <strong>Email:</strong>
                         <a href="mailto:siegfried.duong@gmail.com" className="ml-1 hover:underline">

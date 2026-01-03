@@ -13,9 +13,10 @@ function Header() {
       <header className="relative z-50 w-full h-20 px-4 bg-club-primary text-club-dark flex items-center justify-between lg:hidden">
         <NavLink to="/">
           <img
-            src="/logo_smaller.png"
+            src="/logo_smaller-100x100.webp"
             alt="Club Logo"
             className="h-14 w-14 rounded-full border-2 border-club-secondary"
+            fetchPriority="high"
           />
         </NavLink>
 
@@ -53,9 +54,10 @@ function Header() {
           <NavLink to="/">
             <div className="relative">
               <img
-                src="/logo.png"
+                src="/logo_smaller-200x200.webp"
                 alt="Club Logo"
                 className="h-24 w-24 rounded-full border-4 border-club-secondary"
+                fetchPriority="high"
               />
               <FaChessPawn className="absolute -bottom-2 -right-2 text-2xl text-club-secondary" />
             </div>

@@ -1,4 +1,4 @@
-import image from '../../assets/homePage/chessbanner1.jpeg';
+
 import { useInView } from '../../hooks/useInView';
 
 function WhatToExpectSection() {
@@ -12,7 +12,15 @@ function WhatToExpectSection() {
             </h2 >
 
             <div className="max-w-5xl flex flex-col md:flex-row gap-4 md:gap-8 text-gray-800">
-                <img src={image} alt="Chess banner" className="w-full md:w-1/2 h-56 md:h-full object-contain md:object-cover rounded-2xl shadow-lg" />
+                <img
+                    src="/banner/banner-1200.webp"
+                    srcSet="/banner/banner-400.webp 400w, /banner/banner-800.webp 800w, /banner/banner-1200.webp 1200w, /banner/banner-1920.webp 1920w"
+                    sizes="(max-width: 480px) 100vw, (max-width: 768px) 100vw, 50vw"
+                    alt="Chess banner saying that about chess"
+                    className="w-full md:w-1/2 h-56 md:h-full object-contain md:object-cover rounded-2xl shadow-lg"
+                    loading="lazy"
+                    decoding="async"
+                />
                 <div className="w-full md:w-1/2 flex flex-col">
                     <p className="mb-4 font-serif text-justify text-sm md:text-base lg:text-lg leading-relaxed">
                         At Hanoi Lucky Chess Club, we welcome players of all skill levels, from absolute beginners to seasoned
