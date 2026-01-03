@@ -23,7 +23,7 @@ import { useCaptchaGuard } from "../hooks/useCaptchaGuard";
 import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
     const navigate = useNavigate();
     const { Captcha, runWithCaptcha } = useCaptchaGuard();
 
@@ -290,7 +290,7 @@ function SignUpPage() {
                         </h1>
 
                         <p className="text-center opacity-70 mb-6">
-                            We sent a verification link to <b>{email}</b>.
+                            We sent a verification link to <b>{email}</b> Please check your inbox and click the link to verify your email. The link may take a few minutes to arrive.
                         </p>
 
                         <div className="flex flex-col gap-3">
@@ -318,6 +318,9 @@ function SignUpPage() {
                         <h1 className="text-2xl font-bold text-center mb-6">
                             Chess Profile
                         </h1>
+                        <p className="text-center opacity-70 mb-6">
+                            Link your Chess.com profile to import your ratings and stats.
+                        </p>
 
                         <div className="flex flex-col gap-4">
                             <div className="relative">
@@ -336,9 +339,9 @@ function SignUpPage() {
 
                             <div className="flex justify-between gap-2">
                                 <ButtonSecondary
-                                    label="Back"
+                                    label="Skip for now"
                                     size="sm"
-                                    onClick={() => setStep(2)}
+                                    onClick={() => navigate("/")}
                                 />
 
                                 <ButtonPrimary

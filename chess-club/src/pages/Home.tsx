@@ -1,21 +1,30 @@
+import { Suspense, lazy } from "react"
+import { useInView } from "../hooks/useInView"
 import HeroSection from "../components/homeComponents/HeroSection"
-import ImageCarousel from "../components/homeComponents/ImageCarousel"
-import ClubInfoSection from "../components/homeComponents/ClubInfoSection"
-import CallToAction from "../components/homeComponents/CallToAction"
-import WhatToExpectSection from "../components/homeComponents/WhatToExpectSection"
-import WhoCanJoinSection from "../components/homeComponents/WhoCanJoinSection"
-import FAQ from "../components/homeComponents/FAQ"
+const WhatToExpectSection = lazy(() => import("../components/homeComponents/WhatToExpectSection"))
+const WhoCanJoinSection = lazy(() => import("../components/homeComponents/WhoCanJoinSection"))
+const ClubInfoSection = lazy(() => import("../components/homeComponents/ClubInfoSection"))
+const ImageCarousel = lazy(() => import("../components/homeComponents/ImageCarousel"))
+const CallToAction = lazy(() => import("../components/homeComponents/CallToAction"))
+const FAQ = lazy(() => import("../components/homeComponents/FAQ"))
 
 function Home() {
+  const { ref, inView } = useInView(0.3)
   return (
     <div className="flex flex-col grow w-full ">
       <HeroSection />
-      <WhatToExpectSection />
-      <WhoCanJoinSection />
-      <ClubInfoSection />
-      <ImageCarousel />
-      <CallToAction />
-      <FAQ />
+      <div ref={ref}>
+        {inView && (
+          <Suspense fallback={null}>
+            <WhatToExpectSection />
+            <WhoCanJoinSection />
+            <ClubInfoSection />
+            <ImageCarousel />
+            <CallToAction />
+            <FAQ />
+          </Suspense>
+        )}
+      </div>
     </div>
   )
 }

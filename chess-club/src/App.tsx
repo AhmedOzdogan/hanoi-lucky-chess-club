@@ -1,19 +1,19 @@
 import { Routes, Route } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import Home from './pages/Home'
-import LoginPage from './pages/LoginPage';
-import SignUpPage from './pages/SignUpPage';
-import ForgotPassword from './components/ForgotPassword';
-import ResetPassword from './components/ResetPassword';
-import ChessPuzzle from './pages/ChessPuzzle';
-import Leaderboard from './pages/Leaderboard';
-import Settings from './pages/Settings';
-import Contact from './pages/Contact';
-
 
 import ToastContainer from './components/Toast/ToastContainer';
 
+const Home = lazy(() => import('./pages/Home'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignUpPage = lazy(() => import('./pages/SignUpPage'));
+const ForgotPassword = lazy(() => import('./components/ForgotPassword'));
+const ResetPassword = lazy(() => import('./components/ResetPassword'));
+const ChessPuzzle = lazy(() => import('./pages/ChessPuzzle'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Contact = lazy(() => import('./pages/Contact'));
 
 function App() {
   return (
@@ -23,18 +23,20 @@ function App() {
 
       {/* MAIN CONTENT MUST GROW */}
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/settings/reset-password" element={<ResetPassword />} />
-          <Route path="/chess-puzzles" element={<ChessPuzzle />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/Events" element={<h1>Events</h1>} />
-        </Routes>
+        <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/reset-password" element={<ResetPassword />} />
+            <Route path="/chess-puzzles" element={<ChessPuzzle />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/Events" element={<h1>Events</h1>} />
+          </Routes>
+        </Suspense>
       </main >
 
       <Footer />

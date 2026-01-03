@@ -1,13 +1,14 @@
-import heroImage from "../../assets/homePage/chessBackground.jpeg";
-
 function HeroSection() {
     return (
         <section className="relative w-full h-[40vh] md:h-[60vh] lg:h-[80vh] overflow-hidden">
 
             {/* Background */}
             <img
-                src={heroImage}
+                src="/hero/hero1200.webp"
+                srcSet={`/hero/hero800.webp 800w, /hero/hero1200.webp 1200w, /hero/hero1920.webp 1920w`}
+                sizes="100vw"
                 alt="Hero"
+                fetchPriority="high"
                 className="absolute inset-0 w-full h-full object-cover brightness-110"
             />
 

@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
-import image1 from '../../assets/homePage/chess-together1.jpg';
-import image2 from '../../assets/homePage/chess-together2.jpg';
-import image3 from '../../assets/homePage/chess-together3.jpg';
-import image4 from '../../assets/homePage/chess-together4.jpg';
-import image5 from '../../assets/homePage/chess-together5.jpg';
-import image6 from '../../assets/homePage/chess-together6.jpg';
-import image7 from '../../assets/homePage/chess-together7.jpg';
-import image8 from '../../assets/homePage/chess-together8.jpg';
 
 import { useInView } from "../../hooks/useInView"
 
-const images = [image1, image2, image3, image4, image5, image6, image7, image8];
-const extendedImages = [...images, images[0]]; // smooth looping
+const imagesBase = [1, 2, 3, 4, 5, 6, 7, 8];
+
+const images800 = imagesBase.map(n => `/chessTogether/chess-together${n}-800.webp`);
+const images1200 = imagesBase.map(n => `/chessTogether/chess-together${n}-1200.webp`);
+const images1920 = imagesBase.map(n => `/chessTogether/chess-together${n}-1920.webp`);
+
+const extendedImages800 = [...images800, images800[0]];
+const extendedImages1200 = [...images1200, images1200[0]];
+const extendedImages1920 = [...images1920, images1920[0]];
 
 function ImageCarousel() {
 
@@ -56,7 +55,7 @@ function ImageCarousel() {
                     className="flex h-full w-full transition-transform duration-700 ease-out"
                     style={{ transform: `translateX(-${index * 100}%)` }}
                     onTransitionEnd={() => {
-                        if (index === images.length) {
+                        if (index === images1200.length) {
                             const track = trackRef.current;
                             if (!track) return;
 
@@ -72,12 +71,15 @@ function ImageCarousel() {
                         }
                     }}
                 >
-                    {extendedImages.map((img, i) => (
+                    {extendedImages1200.map((img, i) => (
                         <img
                             key={i}
                             src={img}
+                            srcSet={`${extendedImages800[i]} 800w, ${extendedImages1200[i]} 1200w, ${extendedImages1920[i]} 1920w`}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             className="w-full h-64 md:h-96 lg:h-[32rem] object-cover shrink-0 bg-transparent"
                             loading="lazy"
+                            alt="Hanoi Lucky Chess Club members playing chess together"
                         />
                     ))}
                 </div>
@@ -88,13 +90,15 @@ function ImageCarousel() {
 
             {/* Dots */}
             <div className="flex gap-2 justify-center">
-                {images.map((_, i) => (
+                {images1200.map((_, i) => (
                     <button
                         key={i}
+                        type="button"
+                        aria-label={`Go to picture ${i + 1}`}
                         onClick={() => setIndex(i)}
                         className={`
                             w-8 h-8 md:w-6 md:h-6 lg:w-4 lg:h-4 rounded-full transition-all duration-300
-                            ${i === index % images.length ? "bg-club-dark scale-110" : "bg-gray-400"}
+                            ${i === index % images1200.length ? "bg-club-dark scale-110" : "bg-gray-400"}
                         `}
                     />
                 ))}

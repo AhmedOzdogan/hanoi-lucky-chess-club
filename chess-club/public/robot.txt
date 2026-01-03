@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.hanoiluckychess.com/sitemap.xml
