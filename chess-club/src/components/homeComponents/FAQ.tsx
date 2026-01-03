@@ -15,10 +15,6 @@ function FAQ() {
 
     const faqs = [
         {
-            q: "Do I need to be an experienced chess player to join?",
-            a: "Not at all! We welcome everyone, including absolute beginners, casual players, and experienced competitors. Members are happy to help newcomers learn and improve."
-        },
-        {
             q: "How often does the club meet?",
             a: "We meet twice a week: every Friday evening from 19:00 to 23:00 and every Sunday afternoon from 14:00 to 18:00."
         },
@@ -28,16 +24,28 @@ function FAQ() {
             link: "location"
         },
         {
-            q: "Is there a membership fee?",
-            a: "There are no dues or fees at all for participation and membership. Chess should be accessible. You pay only for your own drinks or snacks at the cafe."
-        },
-        {
-            q: "Can I bring my own chess set or clock?",
-            a: "We have enough boards and clocks for everyone to play and you are welcome to bring your own as well."
+            q: "Do I need to be an experienced chess player to join?",
+            a: "Not at all! We welcome everyone, including absolute beginners, casual players, and experienced competitors. Members are happy to help newcomers learn and improve."
         },
         {
             q: "Are beginners welcome?",
             a: "Yes! Many members are beginners here. You will always find friendly players willing to help you learn."
+        },
+        {
+            q: "Is there a membership fee?",
+            a: "There are no dues or fees at all for participation and membership. Chess should be accessible. You pay only for your own drinks or snacks at the cafe."
+        },
+        {
+            q: "Is joining the chess club a good way to learn English?",
+            a: "During chess meetings, we talk about chess, laugh and joke in Vietnamese, English and several other languages."
+        },
+        {
+            q: "How many languages do club participants speak?",
+            a: "We speak many languages, including Vietnamese, English, French, Spanish, Portuguese, Turkish, German."
+        },
+        {
+            q: "Can I bring my own chess set or clock?",
+            a: "We have enough boards and clocks for everyone to play and you are welcome to bring your own as well."
         },
         {
             q: "Do I need to register before coming?",
@@ -66,14 +74,6 @@ function FAQ() {
         {
             q: "Who started the Hanoi Lucky Chess Club (HLCC) and when?",
             a: "Two friends, Francis Lloyd Holland (from America) and Duong Hai (Vietnamese), started HLCC on December 10, 2023, by taking a chess set to a Hanoi pizzeria and playing with members of the public."
-        },
-        {
-            q: "How many languages do club participants speak?",
-            a: "We speak many languages, including Vietnamese, English, French, Spanish, Portuguese, Turkish, German."
-        },
-        {
-            q: "Is joining the chess club a good way to learn English?",
-            a: "During chess meetings, we talk about chess, laugh and joke in Vietnamese, English and several other languages."
         },
         {
             q: "Can I practice English and make new friends by playing chess with you?",
