@@ -36,30 +36,33 @@ function Contact() {
             <div className="flex flex-col lg:flex-row gap-8 items-center justify-center w-full max-w-6xl">
 
                 {/* Card 1 */}
-                <div className="bg-club-secondary rounded-xl shadow-xl p-10 w-full max-w-2xl text-center border min-h-120">
-                    <h2 className="text-2xl font-bold mb-4">General Contact</h2>
+                <div className="bg-club-secondary rounded-xl shadow-xl p-10 w-full max-w-2xl text-center border min-h-140">
+                    <h2 className="text-xl font-semibold mb-4">Francis Lloyd Holland</h2>
+                    <h3 className="text-lg italic mb-6">Co-Founder</h3>
+
                     <img src={francis} alt="Francis' Profile Picture" className="w-64 h-64 mx-auto mb-4 rounded-full" loading='lazy' />
                     <p className="text-club-dark text-xl mb-2">
                         <strong>Email:</strong>
-                        <a href="mailto:francislholland@gmail.com" className="ml-1 hover:underline">
+                        <a href="mailto:francislholland@gmail.com" className="ml-1 underline hover:text-club-light">
                             francislholland@gmail.com
                         </a>
                     </p>
                     <p className="text-club-dark text-xl mb-2">
                         <strong>Phone:</strong>
-                        <a href="tel:+84333009587" className="ml-1 hover:underline">
+                        <a href="tel:+84333009587" className="ml-1 underline hover:text-club-light">
                             +84 333 009 587 (Zalo/WhatsApp)
                         </a>
                     </p>
                 </div>
 
                 {/* Card 2 */}
-                <div className="bg-club-secondary rounded-xl shadow-xl p-10 w-full max-w-2xl text-center border min-h-120">
-                    <h2 className="text-2xl font-bold mb-4">Club & Events</h2>
+                <div className="bg-club-secondary rounded-xl shadow-xl p-10 w-full max-w-2xl text-center border min-h-140">
+                    <h2 className="text-xl font-semibold mb-4">Duong Hai</h2>
+                    <h3 className="text-lg italic mb-6">Co-Founder</h3>
                     <img src={hai} alt="Hanoi Lucky Chess Club" className="w-64 h-64 mx-auto mb-4 rounded-full" loading='lazy' />
                     <p className="text-club-dark text-xl mb-2">
                         <strong>Email:</strong>
-                        <a href="mailto:siegfried.duong@gmail.com" className="ml-1 hover:underline">
+                        <a href="mailto:siegfried.duong@gmail.com" className="ml-1 underline hover:text-club-light">
                             siegfried.duong@gmail.com
                         </a>
                     </p>
