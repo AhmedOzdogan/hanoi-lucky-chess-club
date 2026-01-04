@@ -44,7 +44,7 @@ function Footer() {
           </a>
 
           <a
-            href="https://www.facebook.com/share/17ovBRMUDA/?mibextid=wwXIfr"
+            href="https://www.facebook.com/share/g/1C1m9d7TmJ/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
